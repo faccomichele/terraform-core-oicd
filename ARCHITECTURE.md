@@ -184,8 +184,8 @@
 - **Rotation**: Keys stored but not automatically rotated (enhancement needed)
 
 ### Password Storage
-- **Hashing**: SHA-256
-- **Note**: For production, use bcrypt or Argon2
+- **Hashing**: SHA-256 (demo/testing only)
+- **Production**: Use bcrypt, scrypt, or Argon2 with salt
 
 ### Data Encryption
 - **DynamoDB**: Encryption at rest enabled

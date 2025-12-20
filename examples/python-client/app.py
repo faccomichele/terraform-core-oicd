@@ -4,6 +4,8 @@ from authlib.integrations.flask_client import OAuth
 import secrets
 
 app = Flask(__name__)
+# WARNING: This is for demo purposes only!
+# In production, use a strong random secret from environment variables
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 
 # Configuration - Update these after deploying your OIDC provider

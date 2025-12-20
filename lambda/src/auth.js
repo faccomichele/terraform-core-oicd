@@ -47,8 +47,8 @@ function getLoginPage(clientId, redirectUri, state, scope, codeChallenge, codeCh
     <button type="submit">Sign In</button>
   </form>
   <div class="info">
-    <p><strong>Demo Credentials:</strong></p>
-    <p>Create a user in DynamoDB or use the token endpoint to test.</p>
+    <p><strong>Note:</strong> This is a demo login page.</p>
+    <p>For production, remove hints and implement proper security measures.</p>
   </div>
 </body>
 </html>

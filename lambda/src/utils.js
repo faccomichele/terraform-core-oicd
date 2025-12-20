@@ -145,6 +145,8 @@ async function getUserByUsername(username) {
 
 async function createUser(username, password, email, profile = {}) {
   const userId = uuidv4();
+  // NOTE: SHA-256 is used for demo purposes only
+  // For production, use bcrypt, scrypt, or Argon2
   const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
   
   const user = {
@@ -165,6 +167,8 @@ async function verifyUserPassword(username, password) {
   const user = await getUserByUsername(username);
   if (!user) return null;
   
+  // NOTE: SHA-256 is used for demo purposes only
+  // For production, use bcrypt.compare() or similar
   const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
   if (passwordHash !== user.password_hash) return null;
   

@@ -12,11 +12,13 @@ const CLIENT_SECRET = process.env.CLIENT_SECRET || 'test-secret';
 const REDIRECT_URI = process.env.REDIRECT_URI || 'http://localhost:3000/callback';
 
 // Session configuration
+// WARNING: This is for demo purposes only!
+// In production, use a strong random secret from environment variables
 app.use(session({
-  secret: 'my-secret-key-change-in-production',
+  secret: process.env.SESSION_SECRET || 'my-secret-key-change-in-production',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false } // Set to true if using HTTPS
+  cookie: { secure: false } // Set to true if using HTTPS in production
 }));
 
 let client;

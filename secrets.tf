@@ -1,9 +1,3 @@
-# Generate RSA key pair for JWT signing
-resource "random_password" "jwt_private_key_passphrase" {
-  length  = 32
-  special = true
-}
-
 # Secrets Manager secret for JWT signing keys
 resource "aws_secretsmanager_secret" "jwt_keys" {
   name                    = "${var.project_name}-${var.environment}-jwt-keys-${random_id.secret_suffix.hex}"

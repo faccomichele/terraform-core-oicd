@@ -261,14 +261,18 @@ terraform destroy
 
 **Note**: Secrets Manager secrets have a 7-day recovery window by default.
 
-## Limitations
+## Limitations & Security Considerations
 
-- This is a basic implementation for demonstration purposes
-- Password hashing uses SHA-256 (consider bcrypt for production)
-- No rate limiting or advanced security features
-- No user registration endpoint
-- No consent screen for authorization
-- Limited scope and claim support
+- **Demo Implementation**: This is for demonstration and testing purposes
+- **Password Security**: Uses SHA-256 hashing (NOT secure for production - use bcrypt, scrypt, or Argon2)
+- **No Rate Limiting**: Implement rate limiting for production use
+- **No User Registration**: User creation requires direct DynamoDB access
+- **No Consent Screen**: Authorization is immediate after login
+- **Limited Scopes**: Only basic OpenID Connect scopes supported
+- **API Gateway Logs**: Data trace enabled - may log sensitive information
+- **No Token Rotation**: JWT signing keys are not automatically rotated
+
+**IMPORTANT**: Do not use this implementation as-is in production without implementing proper security measures!
 
 ## Future Enhancements
 
