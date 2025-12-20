@@ -35,8 +35,8 @@ aws dynamodb put-item \
         "family_name": {"S": "User"}
       }
     },
-    "created_at": {"S": "'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'"},
-    "updated_at": {"S": "'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'"} 
+    "created_at": {"S": "'"$(date -u +"%Y-%m-%dT%H:%M:%SZ")"'"},
+    "updated_at": {"S": "'"$(date -u +"%Y-%m-%dT%H:%M:%SZ")"'"} 
   }'
 
 echo "Sample user created: username=demo, password=password"
@@ -68,7 +68,7 @@ aws dynamodb put-item \
       ]
     },
     "scope": {"S": "openid profile email"},
-    "created_at": {"S": "'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'"} 
+    "created_at": {"S": "'"$(date -u +"%Y-%m-%dT%H:%M:%SZ")"'"} 
   }'
 
 echo "Sample OAuth client created:"
