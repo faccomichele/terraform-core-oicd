@@ -11,8 +11,10 @@ Description: 'GitHub Actions IAM Role - Template for deploying repository-specif
 # 1. Copy this template to your target repository
 # 2. Update the RepositoryName parameter default to match your repository name
 # 3. Optionally adjust Environment parameter if needed
-# 4. Add additional managed policies or inline policies as required for your application
-# 5. Deploy with: aws cloudformation create-stack --stack-name <repo-name>-github-role --template-body file://github-iam-role-template.yaml --capabilities CAPABILITY_NAMED_IAM
+# 4. This template includes a comprehensive inline policy (TerraformDeploymentPolicy) with all permissions
+#    required for Terraform to manage the OIDC provider infrastructure. See cloudformation/TERRAFORM_PERMISSIONS.md
+#    for detailed documentation of all included permissions.
+# 5. Deploy with: aws cloudformation create-stack --stack-name <repo-name>-github-role --template-body file://github-iam-role.yaml --capabilities CAPABILITY_NAMED_IAM
 
 Metadata:
   AWS::CloudFormation::Interface:
