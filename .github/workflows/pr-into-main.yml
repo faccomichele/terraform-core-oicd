@@ -5,7 +5,6 @@ name: PR - TF Plan
 on:
   pull_request:
     types: [opened, edited, reopened, synchronize]
-  workflow_dispatch:
 
 permissions:
   id-token: write
@@ -14,7 +13,6 @@ permissions:
 
 jobs:
   dev:
-    if: ${{ github.event.pull_request.merged == true }}
     name: "[DEV] ${{ matrix.directory }} - ${{ matrix.region }}"
     uses: faccomichele/utils-n-scripts/.github/workflows/terraform-plan-apply.yml@main
     with:
