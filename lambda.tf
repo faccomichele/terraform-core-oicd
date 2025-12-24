@@ -1,156 +1,157 @@
-# # Local variables
-# locals {
-#   issuer_url = var.issuer_url != "" ? var.issuer_url : "${aws_api_gateway_deployment.oidc.invoke_url}${aws_api_gateway_stage.oidc.stage_name}"
-#   lambda_source_dir = "${path.module}/lambda/src"
-# }
+# Local variables
+locals {
+  # issuer_url = var.issuer_url != "" ? var.issuer_url : "${aws_api_gateway_deployment.oidc.invoke_url}${aws_api_gateway_stage.oidc.stage_name}"
+  issuer_url = "CHANGE_ME"
+  lambda_source_dir = "${path.module}/lambda/src"
+}
 
-# # Archive Lambda source code
-# data "archive_file" "lambda_zip" {
-#   type        = "zip"
-#   source_dir  = local.lambda_source_dir
-#   output_path = "${path.module}/lambda/function.zip"
-#   excludes    = ["node_modules", "package-lock.json"]
-# }
+# Archive Lambda source code
+data "archive_file" "lambda_zip" {
+  type        = "zip"
+  source_dir  = local.lambda_source_dir
+  output_path = "${path.module}/lambda/function.zip"
+  excludes    = ["node_modules", "package-lock.json"]
+}
 
-# # Lambda function for wellknown endpoint
-# resource "aws_lambda_function" "wellknown" {
-#   filename         = data.archive_file.lambda_zip.output_path
-#   function_name    = "${var.project_name}-${var.environment}-wellknown"
-#   role            = aws_iam_role.lambda_exec.arn
-#   handler         = "wellknown.handler"
-#   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
-#   runtime         = "nodejs18.x"
-#   timeout         = 30
-#   memory_size     = 256
+# Lambda function for wellknown endpoint
+resource "aws_lambda_function" "wellknown" {
+  filename         = data.archive_file.lambda_zip.output_path
+  function_name    = "${local.project_name}-${local.environment}-wellknown"
+  role            = aws_iam_role.lambda_exec.arn
+  handler         = "wellknown.handler"
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  runtime         = "nodejs18.x"
+  timeout         = 30
+  memory_size     = 256
 
-#   environment {
-#     variables = {
-#       ISSUER_URL         = local.issuer_url
-#       USERS_TABLE        = aws_dynamodb_table.users.name
-#       CLIENTS_TABLE      = aws_dynamodb_table.clients.name
-#       AUTH_CODES_TABLE   = aws_dynamodb_table.auth_codes.name
-#       REFRESH_TOKENS_TABLE = aws_dynamodb_table.refresh_tokens.name
-#       JWT_SECRET_ARN     = aws_secretsmanager_secret.jwt_keys.arn
-#       S3_BUCKET          = aws_s3_bucket.oidc_assets.id
-#     }
-#   }
+  environment {
+    variables = {
+      ISSUER_URL         = local.issuer_url
+      USERS_TABLE        = aws_dynamodb_table.users.name
+      CLIENTS_TABLE      = aws_dynamodb_table.clients.name
+      AUTH_CODES_TABLE   = aws_dynamodb_table.auth_codes.name
+      REFRESH_TOKENS_TABLE = aws_dynamodb_table.refresh_tokens.name
+      JWT_SECRET_ARN     = aws_secretsmanager_secret.jwt_keys.arn
+      S3_BUCKET          = aws_s3_bucket.oidc_assets.id
+    }
+  }
 
-#   tags = {
-#     Name = "${var.project_name}-${var.environment}-wellknown"
-#   }
-# }
+  tags = {
+    Name = "${local.project_name}-${local.environment}-wellknown"
+  }
+}
 
-# # Lambda function for JWKS endpoint
-# resource "aws_lambda_function" "jwks" {
-#   filename         = data.archive_file.lambda_zip.output_path
-#   function_name    = "${var.project_name}-${var.environment}-jwks"
-#   role            = aws_iam_role.lambda_exec.arn
-#   handler         = "jwks.handler"
-#   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
-#   runtime         = "nodejs18.x"
-#   timeout         = 30
-#   memory_size     = 256
+# Lambda function for JWKS endpoint
+resource "aws_lambda_function" "jwks" {
+  filename         = data.archive_file.lambda_zip.output_path
+  function_name    = "${local.project_name}-${local.environment}-jwks"
+  role            = aws_iam_role.lambda_exec.arn
+  handler         = "jwks.handler"
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  runtime         = "nodejs18.x"
+  timeout         = 30
+  memory_size     = 256
 
-#   environment {
-#     variables = {
-#       ISSUER_URL         = local.issuer_url
-#       USERS_TABLE        = aws_dynamodb_table.users.name
-#       CLIENTS_TABLE      = aws_dynamodb_table.clients.name
-#       AUTH_CODES_TABLE   = aws_dynamodb_table.auth_codes.name
-#       REFRESH_TOKENS_TABLE = aws_dynamodb_table.refresh_tokens.name
-#       JWT_SECRET_ARN     = aws_secretsmanager_secret.jwt_keys.arn
-#       S3_BUCKET          = aws_s3_bucket.oidc_assets.id
-#     }
-#   }
+  environment {
+    variables = {
+      ISSUER_URL         = local.issuer_url
+      USERS_TABLE        = aws_dynamodb_table.users.name
+      CLIENTS_TABLE      = aws_dynamodb_table.clients.name
+      AUTH_CODES_TABLE   = aws_dynamodb_table.auth_codes.name
+      REFRESH_TOKENS_TABLE = aws_dynamodb_table.refresh_tokens.name
+      JWT_SECRET_ARN     = aws_secretsmanager_secret.jwt_keys.arn
+      S3_BUCKET          = aws_s3_bucket.oidc_assets.id
+    }
+  }
 
-#   tags = {
-#     Name = "${var.project_name}-${var.environment}-jwks"
-#   }
-# }
+  tags = {
+    Name = "${local.project_name}-${local.environment}-jwks"
+  }
+}
 
-# # Lambda function for auth endpoint
-# resource "aws_lambda_function" "auth" {
-#   filename         = data.archive_file.lambda_zip.output_path
-#   function_name    = "${var.project_name}-${var.environment}-auth"
-#   role            = aws_iam_role.lambda_exec.arn
-#   handler         = "auth.handler"
-#   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
-#   runtime         = "nodejs18.x"
-#   timeout         = 30
-#   memory_size     = 256
+# Lambda function for auth endpoint
+resource "aws_lambda_function" "auth" {
+  filename         = data.archive_file.lambda_zip.output_path
+  function_name    = "${local.project_name}-${local.environment}-auth"
+  role            = aws_iam_role.lambda_exec.arn
+  handler         = "auth.handler"
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  runtime         = "nodejs18.x"
+  timeout         = 30
+  memory_size     = 256
 
-#   environment {
-#     variables = {
-#       ISSUER_URL         = local.issuer_url
-#       USERS_TABLE        = aws_dynamodb_table.users.name
-#       CLIENTS_TABLE      = aws_dynamodb_table.clients.name
-#       AUTH_CODES_TABLE   = aws_dynamodb_table.auth_codes.name
-#       REFRESH_TOKENS_TABLE = aws_dynamodb_table.refresh_tokens.name
-#       JWT_SECRET_ARN     = aws_secretsmanager_secret.jwt_keys.arn
-#       S3_BUCKET          = aws_s3_bucket.oidc_assets.id
-#     }
-#   }
+  environment {
+    variables = {
+      ISSUER_URL         = local.issuer_url
+      USERS_TABLE        = aws_dynamodb_table.users.name
+      CLIENTS_TABLE      = aws_dynamodb_table.clients.name
+      AUTH_CODES_TABLE   = aws_dynamodb_table.auth_codes.name
+      REFRESH_TOKENS_TABLE = aws_dynamodb_table.refresh_tokens.name
+      JWT_SECRET_ARN     = aws_secretsmanager_secret.jwt_keys.arn
+      S3_BUCKET          = aws_s3_bucket.oidc_assets.id
+    }
+  }
 
-#   tags = {
-#     Name = "${var.project_name}-${var.environment}-auth"
-#   }
-# }
+  tags = {
+    Name = "${local.project_name}-${local.environment}-auth"
+  }
+}
 
-# # Lambda function for token endpoint
-# resource "aws_lambda_function" "token" {
-#   filename         = data.archive_file.lambda_zip.output_path
-#   function_name    = "${var.project_name}-${var.environment}-token"
-#   role            = aws_iam_role.lambda_exec.arn
-#   handler         = "token.handler"
-#   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
-#   runtime         = "nodejs18.x"
-#   timeout         = 30
-#   memory_size     = 256
+# Lambda function for token endpoint
+resource "aws_lambda_function" "token" {
+  filename         = data.archive_file.lambda_zip.output_path
+  function_name    = "${local.project_name}-${local.environment}-token"
+  role            = aws_iam_role.lambda_exec.arn
+  handler         = "token.handler"
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  runtime         = "nodejs18.x"
+  timeout         = 30
+  memory_size     = 256
 
-#   environment {
-#     variables = {
-#       ISSUER_URL         = local.issuer_url
-#       USERS_TABLE        = aws_dynamodb_table.users.name
-#       CLIENTS_TABLE      = aws_dynamodb_table.clients.name
-#       AUTH_CODES_TABLE   = aws_dynamodb_table.auth_codes.name
-#       REFRESH_TOKENS_TABLE = aws_dynamodb_table.refresh_tokens.name
-#       JWT_SECRET_ARN     = aws_secretsmanager_secret.jwt_keys.arn
-#       S3_BUCKET          = aws_s3_bucket.oidc_assets.id
-#     }
-#   }
+  environment {
+    variables = {
+      ISSUER_URL         = local.issuer_url
+      USERS_TABLE        = aws_dynamodb_table.users.name
+      CLIENTS_TABLE      = aws_dynamodb_table.clients.name
+      AUTH_CODES_TABLE   = aws_dynamodb_table.auth_codes.name
+      REFRESH_TOKENS_TABLE = aws_dynamodb_table.refresh_tokens.name
+      JWT_SECRET_ARN     = aws_secretsmanager_secret.jwt_keys.arn
+      S3_BUCKET          = aws_s3_bucket.oidc_assets.id
+    }
+  }
 
-#   tags = {
-#     Name = "${var.project_name}-${var.environment}-token"
-#   }
-# }
+  tags = {
+    Name = "${local.project_name}-${local.environment}-token"
+  }
+}
 
-# # Lambda function for userinfo endpoint
-# resource "aws_lambda_function" "userinfo" {
-#   filename         = data.archive_file.lambda_zip.output_path
-#   function_name    = "${var.project_name}-${var.environment}-userinfo"
-#   role            = aws_iam_role.lambda_exec.arn
-#   handler         = "userinfo.handler"
-#   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
-#   runtime         = "nodejs18.x"
-#   timeout         = 30
-#   memory_size     = 256
+# Lambda function for userinfo endpoint
+resource "aws_lambda_function" "userinfo" {
+  filename         = data.archive_file.lambda_zip.output_path
+  function_name    = "${local.project_name}-${local.environment}-userinfo"
+  role            = aws_iam_role.lambda_exec.arn
+  handler         = "userinfo.handler"
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  runtime         = "nodejs18.x"
+  timeout         = 30
+  memory_size     = 256
 
-#   environment {
-#     variables = {
-#       ISSUER_URL         = local.issuer_url
-#       USERS_TABLE        = aws_dynamodb_table.users.name
-#       CLIENTS_TABLE      = aws_dynamodb_table.clients.name
-#       AUTH_CODES_TABLE   = aws_dynamodb_table.auth_codes.name
-#       REFRESH_TOKENS_TABLE = aws_dynamodb_table.refresh_tokens.name
-#       JWT_SECRET_ARN     = aws_secretsmanager_secret.jwt_keys.arn
-#       S3_BUCKET          = aws_s3_bucket.oidc_assets.id
-#     }
-#   }
+  environment {
+    variables = {
+      ISSUER_URL         = local.issuer_url
+      USERS_TABLE        = aws_dynamodb_table.users.name
+      CLIENTS_TABLE      = aws_dynamodb_table.clients.name
+      AUTH_CODES_TABLE   = aws_dynamodb_table.auth_codes.name
+      REFRESH_TOKENS_TABLE = aws_dynamodb_table.refresh_tokens.name
+      JWT_SECRET_ARN     = aws_secretsmanager_secret.jwt_keys.arn
+      S3_BUCKET          = aws_s3_bucket.oidc_assets.id
+    }
+  }
 
-#   tags = {
-#     Name = "${var.project_name}-${var.environment}-userinfo"
-#   }
-# }
+  tags = {
+    Name = "${local.project_name}-${local.environment}-userinfo"
+  }
+}
 
 # # Lambda permissions for API Gateway
 # resource "aws_lambda_permission" "wellknown" {
