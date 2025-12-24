@@ -212,6 +212,7 @@ Resources:
                   - secretsmanager:TagResource
                   - secretsmanager:UntagResource
                   - secretsmanager:ListSecretVersionIds
+                  - secretsmanager:GetResourcePolicy
                 Resource:
                   - !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:oidc-provider-${Environment}-jwt-keys-*'
               
