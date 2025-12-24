@@ -15,7 +15,7 @@ permissions:
 jobs:
   dev:
     if: ${{ github.event.pull_request.merged == true }}
-    name: "[DEV] ${{ matrix.directory }} - ${{ matrix.region }}"
+    name: "[DEV]"
     uses: faccomichele/utils-n-scripts/.github/workflows/terraform-plan-apply.yml@main
     with:
       environment: 'dev'

@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   dev:
-    name: "[DEV] ${{ matrix.directory }} - ${{ matrix.region }}"
+    name: "[DEV]"
     uses: faccomichele/utils-n-scripts/.github/workflows/terraform-plan-apply.yml@main
     with:
       environment: 'dev'
