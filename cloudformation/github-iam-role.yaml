@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'GitHub Actions IAM Role - Template for deploying repository-specific GitHub Actions roles that assume the shared OIDC provider'
 
-# Stack Name: terraform-core-oidc-github-role
+# Stack Name: github-role-for-terraform-core-oidc
 
 # DEPLOYMENT INSTRUCTIONS:
 # PREREQUISITE: The GitHub OIDC provider must be deployed first using the github-identity-provider.yaml template.
@@ -14,7 +14,7 @@ Description: 'GitHub Actions IAM Role - Template for deploying repository-specif
 # 4. This template includes a comprehensive inline policy (TerraformDeploymentPolicy) with all permissions
 #    required for Terraform to manage the OIDC provider infrastructure. See cloudformation/TERRAFORM_PERMISSIONS.md
 #    for detailed documentation of all included permissions.
-# 5. Deploy with: aws cloudformation create-stack --stack-name <repo-name>-github-role --template-body file://github-iam-role.yaml --capabilities CAPABILITY_NAMED_IAM
+# 5. Deploy with: aws cloudformation create-stack --stack-name github-role-for-<repo-name> --template-body file://github-iam-role.yaml --capabilities CAPABILITY_NAMED_IAM
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -23,24 +23,24 @@ Metadata:
           default: Repository Configuration
         Parameters:
           - Organization
-          - RepositoryName
+          - ProjectName
           - Environment
       - Label:
           default: Infrastructure References
         Parameters:
           - OIDCProviderStackName
-          - SSMParameterReadPolicyName
+          - TerraformAccessPolicyAccountID
     ParameterLabels:
       Organization:
         default: GitHub Organization
-      RepositoryName:
+      ProjectName:
         default: Repository Name
       Environment:
         default: Environment
       OIDCProviderStackName:
         default: OIDC Provider Stack Name
-      SSMParameterReadPolicyName:
-        default: SSM Parameter Read Policy Name
+      TerraformAccessPolicyAccountID:
+        default: Terraform Access Policy Account ID
 
 Parameters:
   Organization:
@@ -52,7 +52,7 @@ Parameters:
     AllowedPattern: ^[a-z0-9-]+$
     ConstraintDescription: Must be lowercase alphanumeric with hyphens only
   
-  RepositoryName:
+  ProjectName:
     Type: String
     Description: Name of the GitHub repository (change this when copying to another repo)
     Default: terraform-core-oidc
@@ -75,12 +75,32 @@ Parameters:
     Description: Name of the stack that deployed the GitHub OIDC provider
     Default: github-identity-provider
   
-  SSMParameterReadPolicyName:
+  TerraformAccessPolicyAccountID:
     Type: String
-    Description: Name of the SSM parameter read managed policy (from terraform-core-aws stack)
-    Default: terraform-core-aws-ssm-read-dev
+    Description: The account ID for Terraform access managed policy (from terraform-core-aws stack)
 
 Resources:
+  # IAM role for API Gateway to push logs to CloudWatch
+  APIGatewayCloudWatchLogsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Purpose
+          Value: API Gateway CloudWatch Logs Integration
+
   # IAM role for GitHub Actions (repository-specific)
   GitHubActionsRole:
     Type: AWS::IAM::Role
@@ -98,16 +118,12 @@ Resources:
             Action: sts:AssumeRoleWithWebIdentity
             Condition:
               StringLike:
-                token.actions.githubusercontent.com:sub: !Sub 'repo:${Organization}/${RepositoryName}:*'
+                token.actions.githubusercontent.com:sub: !Sub 'repo:${Organization}/${ProjectName}:*'
               StringEquals:
                 token.actions.githubusercontent.com:aud: sts.amazonaws.com
       ManagedPolicyArns:
         # REQUIRED: SSM parameter read policy to retrieve Terraform backend configuration
-        - !Sub 'arn:aws:iam::${AWS::AccountId}:policy/${SSMParameterReadPolicyName}'
-        # ADD YOUR APPLICATION-SPECIFIC MANAGED POLICIES BELOW
-        # Examples:
-        # - arn:aws:iam::aws:policy/ReadOnlyAccess
-        # - !Sub 'arn:aws:iam::${AWS::AccountId}:policy/my-custom-policy'
+        - !Sub 'arn:aws:iam::${TerraformAccessPolicyAccountID}:policy/terraform-core-aws-tf-access-dev'
       # Inline policy with required Terraform permissions
       Policies:
         - PolicyName: TerraformDeploymentPolicy
@@ -148,6 +164,16 @@ Resources:
                   - !Sub 'arn:aws:apigateway:${AWS::Region}::/restapis'
                   - !Sub 'arn:aws:apigateway:${AWS::Region}::/restapis/*'
                   - !Sub 'arn:aws:apigateway:${AWS::Region}::/tags/*'
+              
+              # API Gateway account settings (required for CloudWatch Logs integration)
+              - Sid: APIGatewayAccountSettings
+                Effect: Allow
+                Action:
+                  - apigateway:UpdateAccount
+                  - apigateway:PATCH
+                  - apigateway:GET
+                Resource:
+                  - !Sub 'arn:aws:apigateway:${AWS::Region}::/account'
               
               # DynamoDB permissions
               - Sid: DynamoDBManagement
@@ -216,7 +242,7 @@ Resources:
                 Resource:
                   - !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:oidc-provider-${Environment}-jwt-keys-*'
               
-              # IAM permissions for Lambda execution role
+              # IAM permissions for Lambda execution role and API Gateway CloudWatch role
               - Sid: IAMRoleManagement
                 Effect: Allow
                 Action:
@@ -237,6 +263,7 @@ Resources:
                   - iam:PassRole
                 Resource:
                   - !Sub 'arn:aws:iam::${AWS::AccountId}:role/oidc-provider-${Environment}-lambda-exec'
+                  - !Sub 'arn:aws:iam::${AWS::AccountId}:role/oidc-provider-${Environment}-api-gateway-cloudwatch'
               
               # IAM permissions for managed policies (read-only)
               - Sid: IAMPolicyReadAccess
@@ -286,24 +313,42 @@ Resources:
                 Action:
                   - apigateway:GET
                   - lambda:ListFunctions
+                  - lambda:GetFunctionCodeSigningConfig
                   - dynamodb:ListTables
                   - s3:ListAllMyBuckets
                   - secretsmanager:ListSecrets
                   - iam:ListRoles
                 Resource: '*'
       Tags:
+        - Key: Project
+          Value: !Ref ProjectName
         - Key: Organization
           Value: !Ref Organization
-        - Key: Repository
-          Value: !Ref RepositoryName
         - Key: Environment
           Value: !Ref Environment
         - Key: RepositoryURL
-          Value: !Sub 'https://github.com/${Organization}/${RepositoryName}'
+          Value: !Sub 'https://github.com/${Organization}/${ProjectName}'
         - Key: Automation
           Value: CloudFormation
+        - Key: RepositoryPath
+          Value: cloudformation
         - Key: RepositoryFile
           Value: github-iam-role.yaml
         - Key: Description
-          Value: !Sub 'IAM role for GitHub Actions in ${Organization}/${RepositoryName}'
+          Value: !Sub 'IAM role for GitHub Actions in ${Organization}/${ProjectName}'
+        - Key: Region
+          Value: !Ref 'AWS::Region'
+
+Outputs:
+  APIGatewayCloudWatchLogsRoleArn:
+    Description: ARN of the IAM role for API Gateway CloudWatch Logs integration
+    Value: !GetAtt APIGatewayCloudWatchLogsRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-APIGatewayCloudWatchLogsRoleArn'
+  
+  GitHubActionsRoleArn:
+    Description: ARN of the IAM role for GitHub Actions
+    Value: !GetAtt GitHubActionsRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-GitHubActionsRoleArn'
 

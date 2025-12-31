@@ -21,7 +21,7 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project     = var.tags["Repository"] != null ? var.tags["Repository"] : "unknown"
+      Project     = var.tags["Project"] != null ? var.tags["Project"] : "unknown"
       Environment = local.environment
       ManagedBy   = "Terraform"
     }

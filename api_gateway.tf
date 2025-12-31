@@ -1,3 +1,8 @@
+# Configure API Gateway Account Settings with CloudWatch Logs Role
+resource "aws_api_gateway_account" "main" {
+  cloudwatch_role_arn = aws_iam_role.api_gateway_cloudwatch.arn
+}
+
 # API Gateway REST API
 resource "aws_api_gateway_rest_api" "oidc" {
   name        = "${local.project_name}-${local.environment}-api"
@@ -272,4 +277,6 @@ resource "aws_api_gateway_method_settings" "oidc" {
     data_trace_enabled = true
     metrics_enabled    = true
   }
+
+  depends_on = [aws_api_gateway_account.main]
 }

@@ -153,43 +153,43 @@ resource "aws_lambda_function" "userinfo" {
   }
 }
 
-# # Lambda permissions for API Gateway
-# resource "aws_lambda_permission" "wellknown" {
-#   statement_id  = "AllowAPIGatewayInvoke"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.wellknown.function_name
-#   principal     = "apigateway.amazonaws.com"
-#   source_arn    = "${aws_api_gateway_rest_api.oidc.execution_arn}/*/*"
-# }
+# Lambda permissions for API Gateway
+resource "aws_lambda_permission" "wellknown" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.wellknown.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.oidc.execution_arn}/*/*"
+}
 
-# resource "aws_lambda_permission" "jwks" {
-#   statement_id  = "AllowAPIGatewayInvoke"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.jwks.function_name
-#   principal     = "apigateway.amazonaws.com"
-#   source_arn    = "${aws_api_gateway_rest_api.oidc.execution_arn}/*/*"
-# }
+resource "aws_lambda_permission" "jwks" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.jwks.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.oidc.execution_arn}/*/*"
+}
 
-# resource "aws_lambda_permission" "auth" {
-#   statement_id  = "AllowAPIGatewayInvoke"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.auth.function_name
-#   principal     = "apigateway.amazonaws.com"
-#   source_arn    = "${aws_api_gateway_rest_api.oidc.execution_arn}/*/*"
-# }
+resource "aws_lambda_permission" "auth" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.auth.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.oidc.execution_arn}/*/*"
+}
 
-# resource "aws_lambda_permission" "token" {
-#   statement_id  = "AllowAPIGatewayInvoke"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.token.function_name
-#   principal     = "apigateway.amazonaws.com"
-#   source_arn    = "${aws_api_gateway_rest_api.oidc.execution_arn}/*/*"
-# }
+resource "aws_lambda_permission" "token" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.token.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.oidc.execution_arn}/*/*"
+}
 
-# resource "aws_lambda_permission" "userinfo" {
-#   statement_id  = "AllowAPIGatewayInvoke"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.userinfo.function_name
-#   principal     = "apigateway.amazonaws.com"
-#   source_arn    = "${aws_api_gateway_rest_api.oidc.execution_arn}/*/*"
-# }
+resource "aws_lambda_permission" "userinfo" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.userinfo.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.oidc.execution_arn}/*/*"
+}
