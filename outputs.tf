@@ -1,17 +1,17 @@
-# output "api_gateway_url" {
-#   description = "Base URL of the API Gateway"
-#   value       = aws_api_gateway_deployment.oidc.invoke_url
-# }
+output "api_gateway_url" {
+  description = "Base URL of the API Gateway"
+  value       = aws_api_gateway_deployment.oidc.invoke_url
+}
 
-# output "oidc_issuer_url" {
-#   description = "OIDC Issuer URL"
-#   value       = local.issuer_url
-# }
+output "oidc_issuer_url" {
+  description = "OIDC Issuer URL"
+  value       = local.issuer_url
+}
 
-# output "wellknown_configuration_url" {
-#   description = "OpenID Connect configuration endpoint"
-#   value       = "${local.issuer_url}/.well-known/openid-configuration"
-# }
+output "wellknown_configuration_url" {
+  description = "OpenID Connect configuration endpoint"
+  value       = "${local.issuer_url}/.well-known/openid-configuration"
+}
 
 output "dynamodb_users_table" {
   description = "DynamoDB table name for users"
