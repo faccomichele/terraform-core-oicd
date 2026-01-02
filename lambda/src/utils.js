@@ -198,6 +198,7 @@ async function createUser(username, password, email, profile = {}) {
     username: username,
     password_hash: passwordHash,
     email: email,
+    email_verified: false,
     profile: profile,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()

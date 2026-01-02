@@ -26,7 +26,8 @@ function validatePassword(password) {
   if (!/[0-9]/.test(password)) {
     return createErrorResponse('invalid_request', 'Password must contain at least one number');
   }
-  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+  // Special characters: include common password special characters
+  if (!/[!@#$%^&*(),.?":{}|<>\-_+=~[\]\\]/.test(password)) {
     return createErrorResponse('invalid_request', 'Password must contain at least one special character');
   }
   return null;
@@ -112,10 +113,9 @@ async function handleCreateUser(event) {
     return createErrorResponse('invalid_request', 'Invalid username format. Username must be 3-50 characters and contain only letters, numbers, dashes, and underscores');
   }
   
-  // Validate email format with more comprehensive regex
-  // This pattern checks for basic email structure with proper domain validation
-  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-  if (!emailRegex.test(email)) {
+  // Validate email format - simple but effective pattern
+  // Checks for: local-part @ domain . tld
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
     return createErrorResponse('invalid_request', 'Invalid email format');
   }
   
