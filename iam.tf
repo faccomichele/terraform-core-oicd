@@ -81,7 +81,7 @@ resource "aws_iam_role_policy" "lambda_oidc" {
           "${aws_dynamodb_table.refresh_tokens.arn}/index/*"
         ]
       },
-      
+
       {
         Effect = "Allow"
         Action = [

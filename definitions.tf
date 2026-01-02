@@ -1,9 +1,9 @@
 locals {
-  environment             = split("_", terraform.workspace)[0]
-  aws_region              = split("_", terraform.workspace)[1]
-  project_name            = "oidc-provider"
-  lambda_source_dir       = "${path.module}/lambda/src"
-  issuer_url_parameter    = "/${local.project_name}/${local.environment}/issuer-url" 
+  environment          = split("_", terraform.workspace)[0]
+  aws_region           = split("_", terraform.workspace)[1]
+  project_name         = "oidc-provider"
+  lambda_source_dir    = "${path.module}/lambda/src"
+  issuer_url_parameter = "/${local.project_name}/${local.environment}/issuer-url"
 }
 
 locals {
