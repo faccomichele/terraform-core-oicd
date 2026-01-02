@@ -78,7 +78,7 @@ terraform-core-oicd/
 │   ├── s3.tf
 │   ├── secrets.tf
 │   └── iam.tf
-├── Lambda Functions (7 files)
+├── Lambda Functions (8 files)
 │   └── lambda/src/
 │       ├── package.json
 │       ├── utils.js
@@ -86,7 +86,8 @@ terraform-core-oicd/
 │       ├── jwks.js
 │       ├── auth.js
 │       ├── token.js
-│       └── userinfo.js
+│       ├── userinfo.js
+│       └── user-management.js
 ├── Documentation (8 files)
 │   ├── README.md
 │   ├── ARCHITECTURE.md
@@ -109,7 +110,7 @@ terraform-core-oicd/
     ├── setup.sh
     └── seed-data.sh
 
-Total: 32 files created
+Total: 33 files created
 ```
 
 ## Security Considerations
@@ -124,9 +125,9 @@ Total: 32 files created
 - ✅ IAM least privilege policies
 
 ### Demo-Only Features (Documented)
-- ⚠️ SHA-256 password hashing (should use bcrypt/Argon2 in production)
+- ✅ Bcrypt password hashing (security enhancement completed)
 - ⚠️ No rate limiting (should be added for production)
-- ⚠️ No user registration endpoint (requires direct DynamoDB access)
+- ✅ User management Lambda for creating users and resetting passwords
 - ⚠️ No consent screen (authorization is immediate)
 - ⚠️ Example clients have known security issues for demo purposes
 
@@ -162,7 +163,7 @@ All security limitations are **clearly documented** with warnings.
 - IAM
 
 ### Libraries & Tools
-- **Lambda**: AWS SDK v3, jsonwebtoken, uuid, crypto
+- **Lambda**: AWS SDK v3, jsonwebtoken, uuid, crypto, bcrypt
 - **Node.js Example**: openid-client, express, express-session
 - **Python Example**: authlib, Flask, requests
 - **IaC**: Terraform >= 1.0
@@ -234,14 +235,15 @@ Each major aspect has comprehensive documentation:
 ## Future Enhancements
 
 Documented in CHANGELOG.md:
-- User registration endpoint
+- ✅ Better password hashing (bcrypt implemented)
+- ✅ User management functionality (Lambda function added)
+- User registration endpoint (exposed via API)
 - Consent screen
 - Additional grant types
 - Token rotation
 - Rate limiting
 - Admin API
 - Multi-factor authentication
-- Better password hashing
 
 ## Summary
 

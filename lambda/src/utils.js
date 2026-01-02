@@ -5,6 +5,7 @@ const { SSMClient, GetParameterCommand } = require('@aws-sdk/client-ssm');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
+const bcrypt = require('bcrypt');
 
 const dynamoClient = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(dynamoClient);
@@ -185,24 +186,26 @@ async function getUserByUsername(username) {
   return items.length > 0 ? items[0] : null;
 }
 
-async function createUser(username, password, email, profile = {}) {
+/**
+ * Create a new user with bcrypt password hashing
+ * @param {string} username - The username for the new user
+ * @param {string} password - The plain text password (will be hashed with bcrypt)
+ * @param {string} email - The email address for the new user
+ * @returns {Promise<object>} - The created user object (includes password_hash)
+ */
+async function createUser(username, password, email) {
   const userId = uuidv4();
   
-  // ⚠️ SECURITY WARNING: SHA-256 is NOT SECURE for password hashing!
-  // This is for DEMO/TESTING purposes only.
-  // For production, you MUST use:
-  //   - bcrypt (recommended)
-  //   - scrypt
-  //   - Argon2
-  // These algorithms include salt and are designed to be slow to prevent brute-force attacks.
-  const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
+  // Use bcrypt for secure password hashing
+  // Salt rounds = 10 provides a good balance between security and performance
+  const passwordHash = await bcrypt.hash(password, 10);
   
   const user = {
     user_id: userId,
     username: username,
     password_hash: passwordHash,
     email: email,
-    profile: profile,
+    email_verified: false,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
   };
@@ -215,12 +218,24 @@ async function verifyUserPassword(username, password) {
   const user = await getUserByUsername(username);
   if (!user) return null;
   
-  // ⚠️ SECURITY WARNING: SHA-256 is NOT SECURE for password hashing!
-  // This is for DEMO/TESTING purposes only.
-  // For production, use bcrypt.compare() or similar secure comparison.
-  const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
-  if (passwordHash !== user.password_hash) return null;
+  // Use bcrypt for secure password comparison
+  const isValid = await bcrypt.compare(password, user.password_hash);
+  if (!isValid) return null;
   
+  return user;
+}
+
+async function updateUserPassword(userId, newPassword) {
+  const user = await getUserById(userId);
+  if (!user) return null;
+  
+  // Use bcrypt for secure password hashing
+  const passwordHash = await bcrypt.hash(newPassword, 10);
+  
+  user.password_hash = passwordHash;
+  user.updated_at = new Date().toISOString();
+  
+  await putItem(TABLES.users, user);
   return user;
 }
 
@@ -336,6 +351,7 @@ module.exports = {
   getUserByUsername,
   createUser,
   verifyUserPassword,
+  updateUserPassword,
   getClientById,
   validateClient,
   createAuthCode,

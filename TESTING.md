@@ -225,13 +225,69 @@ aws dynamodb get-item \
 
 ### Issue: "Invalid username or password"
 
-**Solution**: Check the password hash. For demo user with password "password":
+**Solution**: Check the password hash. Passwords are now hashed using bcrypt. The demo user has password "password".
 
+To verify or create a new hash:
 ```javascript
-// SHA-256 hash of "password"
-const crypto = require('crypto');
-console.log(crypto.createHash('sha256').update('password').digest('hex'));
-// Output: ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f
+// Using bcrypt (Node.js)
+const bcrypt = require('bcrypt');
+bcrypt.hash('password', 10).then(hash => console.log(hash));
+```
+
+Or use the user-management Lambda function to create/reset user passwords (see section below).
+
+### Testing User Management Lambda
+
+The `user-management` Lambda function can be tested from the AWS Console or AWS CLI.
+
+**Test from AWS Console:**
+1. Go to AWS Lambda Console
+2. Find function: `oidc-provider-<environment>-user-management`
+3. Go to "Test" tab
+4. Create a test event with one of the payloads below
+
+**Password Requirements:**
+- Minimum 8 characters
+- At least one uppercase letter
+- At least one lowercase letter
+- At least one number
+- At least one special character
+
+**Create a new user:**
+```json
+{
+  "operation": "createUser",
+  "username": "testuser",
+  "password": "SecurePassword123!",
+  "email": "testuser@example.com"
+}
+```
+
+**Reset a user's password:**
+```json
+{
+  "operation": "resetPassword",
+  "username": "testuser",
+  "newPassword": "NewSecurePassword123!"
+}
+```
+
+**Test from AWS CLI:**
+```bash
+# Create a new user
+aws lambda invoke \
+  --function-name oidc-provider-dev-user-management \
+  --payload '{"operation":"createUser","username":"testuser","password":"SecurePassword123!","email":"testuser@example.com"}' \
+  response.json
+
+# Reset password
+aws lambda invoke \
+  --function-name oidc-provider-dev-user-management \
+  --payload '{"operation":"resetPassword","username":"testuser","newPassword":"NewSecurePassword123!"}' \
+  response.json
+
+# View the response
+cat response.json
 ```
 
 ### Issue: "Token verification failed"

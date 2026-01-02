@@ -25,16 +25,9 @@ aws dynamodb put-item \
   --item '{
     "user_id": {"S": "user-123"},
     "username": {"S": "demo"},
-    "password_hash": {"S": "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f"},
+    "password_hash": {"S": "$2b$10$GiFmZumcIdWb6YTzDrR4XOpNJAkC9HWeMA0wTF4fie.44RIT5M3B2"},
     "email": {"S": "demo@example.com"},
     "email_verified": {"BOOL": true},
-    "profile": {
-      "M": {
-        "name": {"S": "Demo User"},
-        "given_name": {"S": "Demo"},
-        "family_name": {"S": "User"}
-      }
-    },
     "created_at": {"S": "'"$(date -u +"%Y-%m-%dT%H:%M:%SZ")"'"},
     "updated_at": {"S": "'"$(date -u +"%Y-%m-%dT%H:%M:%SZ")"'"} 
   }'
