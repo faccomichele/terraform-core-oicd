@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Authorization Code Flow with PKCE support
 - RS256 JWT signing with 2048-bit RSA keys
 - Access tokens, ID tokens, and refresh tokens
-- User authentication with SHA-256 password hashing
+- User authentication with bcrypt password hashing
 - OAuth 2.0 client validation
 - Standard OIDC scopes (openid, profile, email)
 - CORS support for all endpoints
@@ -51,11 +51,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Server-side encryption for S3 bucket
 - Secrets Manager for secure key storage
 - PKCE support for public clients
-- Secure password hashing (SHA-256)
+- Secure password hashing (bcrypt)
 - Token expiration (1 hour for access/ID tokens, 30 days for refresh)
 - Authorization code expiration (10 minutes)
 
 ## [Unreleased]
+
+### Added
+- User management Lambda function for creating users and resetting passwords
+  - Can be invoked from AWS Console with test payloads
+  - Supports `createUser` and `resetPassword` operations
+  - Includes input validation for username, email, and password strength
+- Output variables for user management Lambda (ARN and name)
+
+### Changed
+- Replaced SHA-256 password hashing with bcrypt (salt rounds: 10)
+- Updated `createUser` function to use bcrypt for secure password hashing
+- Updated `verifyUserPassword` function to use bcrypt.compare for verification
+- Added `updateUserPassword` function for password reset functionality
+- Updated seed-data.sh script to use bcrypt-hashed passwords
+- Updated documentation to reflect bcrypt usage
+
+### Security
+- **SECURITY FIX**: Replaced insecure SHA-256 password hashing with bcrypt
+- bcrypt provides proper salt generation and is designed to be slow to prevent brute-force attacks
 
 ### Fixed
 - Fixed Lambda "Cannot find module 'jsonwebtoken'" error by including node_modules in deployment package
@@ -70,11 +89,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for implicit grant
 - Token rotation and key rotation
 - Rate limiting
-- Admin API for user/client management
 - Multi-factor authentication
 - Custom claims support
 - Session management
-- Better password hashing (bcrypt/Argon2)
 - Custom domain support
 - WAF integration
 - Enhanced monitoring and alerting

@@ -38,3 +38,13 @@ output "issuer_url_ssm_parameter" {
   description = "SSM Parameter name storing the OIDC Issuer URL"
   value       = aws_ssm_parameter.issuer_url.name
 }
+
+output "user_management_lambda_arn" {
+  description = "ARN of the user management Lambda function"
+  value       = aws_lambda_function.user_management.arn
+}
+
+output "user_management_lambda_name" {
+  description = "Name of the user management Lambda function"
+  value       = aws_lambda_function.user_management.function_name
+}

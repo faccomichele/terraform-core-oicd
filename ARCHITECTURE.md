@@ -155,7 +155,7 @@
 2. Lambda displays login form (HTML)
 3. User submits credentials
 4. Lambda queries DynamoDB Users table
-5. Password verified using SHA-256 hash comparison
+5. Password verified using bcrypt hash comparison
 6. Authorization code created in DynamoDB Auth Codes table
 7. User redirected back to client with code
 
@@ -184,8 +184,9 @@
 - **Rotation**: Keys stored but not automatically rotated (enhancement needed)
 
 ### Password Storage
-- **Hashing**: SHA-256 (demo/testing only)
-- **Production**: Use bcrypt, scrypt, or Argon2 with salt
+- **Hashing**: bcrypt with salt rounds of 10
+- **Security**: bcrypt is designed to be slow to prevent brute-force attacks
+- **Salt**: Automatically generated per password by bcrypt
 
 ### Data Encryption
 - **DynamoDB**: Encryption at rest enabled

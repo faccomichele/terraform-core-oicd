@@ -135,17 +135,55 @@ terraform output
 
 ### Managing Users
 
-Users are stored in DynamoDB. Password is hashed using SHA-256.
+Users are stored in DynamoDB. Passwords are securely hashed using bcrypt with salt rounds of 10.
 
-**Add a new user via AWS CLI:**
+**Add a new user using the User Management Lambda:**
+
+The easiest way to create users or reset passwords is to use the dedicated `user-management` Lambda function from the AWS Console:
+
+1. Navigate to AWS Lambda Console
+2. Find the function named `oidc-provider-<environment>-user-management`
+3. Use the "Test" tab with one of the following payloads:
+
+**Create a new user:**
+```json
+{
+  "operation": "createUser",
+  "username": "john",
+  "password": "SecurePassword123!",
+  "email": "john@example.com",
+  "profile": {
+    "name": "John Doe",
+    "given_name": "John",
+    "family_name": "Doe"
+  }
+}
+```
+
+**Reset a user's password:**
+```json
+{
+  "operation": "resetPassword",
+  "username": "john",
+  "newPassword": "NewSecurePassword123!"
+}
+```
+
+**Alternatively, add a user directly via AWS CLI:**
+
+Note: You'll need to generate a bcrypt hash for the password first.
 
 ```bash
+# Generate bcrypt hash using Node.js (requires bcrypt package)
+node -e "const bcrypt = require('bcrypt'); bcrypt.hash('your-password', 10).then(hash => console.log(hash));"
+
+# Then add the user
 aws dynamodb put-item \
   --table-name oidc-provider-dev-users \
   --item '{
     "user_id": {"S": "user-456"},
     "username": {"S": "john"},
-    "password_hash": {"S": "<sha256-hash>"},
+    "password_hash": {"S": "<bcrypt-hash>"},
     "email": {"S": "john@example.com"},
     "profile": {"M": {"name": {"S": "John Doe"}}},
     "created_at": {"S": "2024-01-01T00:00:00Z"},
@@ -190,12 +228,13 @@ All Lambda functions are Node.js 18.x with shared utilities:
 - **auth**: Handles authorization requests and user login
 - **token**: Issues access tokens, ID tokens, and refresh tokens
 - **userinfo**: Returns user profile information
+- **user-management**: Administrative function for creating users and resetting passwords (console invocation only)
 
 ### Security
 
 - RSA 2048-bit keys for JWT signing (stored in Secrets Manager)
 - PKCE support for public clients
-- Secure password hashing (SHA-256)
+- Secure password hashing using bcrypt with salt rounds of 10
 - DynamoDB encryption at rest
 - S3 bucket encryption
 - API Gateway with CloudWatch logging
@@ -275,23 +314,26 @@ terraform destroy
 ## Limitations & Security Considerations
 
 - **Demo Implementation**: This is for demonstration and testing purposes
-- **Password Security**: Uses SHA-256 hashing (NOT secure for production - use bcrypt, scrypt, or Argon2)
 - **No Rate Limiting**: Implement rate limiting for production use
-- **No User Registration**: User creation requires direct DynamoDB access
+- **User Registration**: Use the user-management Lambda function from AWS Console to create users and reset passwords
 - **No Consent Screen**: Authorization is immediate after login
 - **Limited Scopes**: Only basic OpenID Connect scopes supported
 - **API Gateway Logs**: Data trace enabled - may log sensitive information
 - **No Token Rotation**: JWT signing keys are not automatically rotated
 
+**Password Security**: Now uses bcrypt with salt rounds of 10 for secure password hashing.
+
 **IMPORTANT**: Do not use this implementation as-is in production without implementing proper security measures!
 
 ## Future Enhancements
 
-- [ ] Add user registration and password reset
+- [x] Password reset functionality (added in user-management Lambda)
+- [x] Better password hashing with bcrypt (completed)
+- [ ] User registration endpoint (exposed via API)
 - [ ] Implement consent screen
 - [ ] Add support for more grant types (client credentials, implicit)
 - [ ] Enhanced security (rate limiting, brute force protection)
-- [ ] User management API
+- [ ] User management API (exposed via API Gateway)
 - [ ] Admin dashboard
 - [ ] Support for custom claims
 - [ ] Multi-factor authentication
