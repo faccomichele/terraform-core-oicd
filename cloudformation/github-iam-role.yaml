@@ -206,7 +206,7 @@ Resources:
                   - ssm:RemoveTagsFromResource
                   - ssm:ListTagsForResource
                 Resource:
-                  - !Sub 'arn:aws:ssm:*:${AWS::AccountId}:parameter/oidc-provider-${Environment}-*'
+                  - !Sub 'arn:aws:ssm:*:${AWS::AccountId}:parameter/oidc-provider/${Environment}/*'
               
               # IAM permissions for Lambda execution role and API Gateway CloudWatch role
               - Sid: IAMRoleManagement

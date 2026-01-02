@@ -19,7 +19,7 @@ resource "aws_ssm_parameter" "issuer_url" {
 # Note: For enhanced security and audit capabilities, consider using a 
 # customer-managed KMS key by adding: key_id = aws_kms_key.example.id
 resource "aws_ssm_parameter" "jwt_keys" {
-  name        = "${local.project_name}-${local.environment}-jwt-keys"
+  name        = "${local.project_name}/${local.environment}/jwt-keys"
   description = "RSA key pair for JWT signing (encrypted)"
   type        = "SecureString"
 
@@ -36,6 +36,6 @@ resource "aws_ssm_parameter" "jwt_keys" {
   }
 
   tags = {
-    Name = "${local.project_name}-${local.environment}-jwt-keys"
+    Name = "${local.project_name}/${local.environment}/jwt-keys"
   }
 }
