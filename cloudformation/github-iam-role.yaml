@@ -297,7 +297,6 @@ Resources:
                   - lambda:ListFunctions
                   - lambda:GetFunctionCodeSigningConfig
                   - dynamodb:ListTables
-                  - s3:ListAllMyBuckets
                   - secretsmanager:ListSecrets
                   - ssm:DescribeParameters
                   - iam:ListRoles
