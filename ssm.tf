@@ -31,7 +31,7 @@ resource "null_resource" "update_issuer_url" {
     command = <<-EOT
       aws ssm put-parameter \
         --name "${aws_ssm_parameter.issuer_url.name}" \
-        --value "${aws_api_gateway_deployment.oidc.invoke_url}${local.environment}" \
+        --value "${aws_api_gateway_deployment.oidc.invoke_url}/${local.environment}" \
         --type String \
         --overwrite \
         --region ${local.aws_region}

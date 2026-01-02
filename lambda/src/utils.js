@@ -20,10 +20,15 @@ const TABLES = {
 
 // Cache for issuer URL to avoid repeated SSM calls
 let cachedIssuerUrl = null;
+let cacheTimestamp = null;
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 // Get issuer URL from SSM Parameter Store
 async function getIssuerUrl() {
-  if (cachedIssuerUrl) {
+  const now = Date.now();
+  
+  // Return cached value if still valid
+  if (cachedIssuerUrl && cacheTimestamp && (now - cacheTimestamp) < CACHE_TTL_MS) {
     return cachedIssuerUrl;
   }
 
@@ -33,6 +38,7 @@ async function getIssuerUrl() {
     }));
     
     cachedIssuerUrl = response.Parameter.Value;
+    cacheTimestamp = now;
     return cachedIssuerUrl;
   } catch (error) {
     console.error('Error getting issuer URL from SSM:', error);
