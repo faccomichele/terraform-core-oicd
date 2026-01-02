@@ -292,7 +292,7 @@ cat response.json
 
 ### Issue: "Token verification failed"
 
-**Solution**: Ensure the JWT keys are properly generated in Secrets Manager. The Lambda function will generate them on first run.
+**Solution**: Ensure the JWT keys are properly generated in SSM Parameter Store. The Lambda function will generate them on first run.
 
 ### Issue: CORS errors
 

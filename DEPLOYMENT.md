@@ -78,7 +78,7 @@ Review the plan. You should see resources to be created:
 - 5 Lambda functions
 - 4 DynamoDB tables
 - 1 S3 bucket
-- 1 Secrets Manager secret
+- 2 SSM parameters (encrypted)
 - IAM roles and policies
 
 ### 6. Deploy Infrastructure
@@ -159,7 +159,7 @@ After deployment, verify:
 - [ ] API Gateway created and accessible
 - [ ] All Lambda functions deployed
 - [ ] DynamoDB tables created with proper TTL
-- [ ] Secrets Manager secret created
+- [ ] SSM parameters created (encrypted)
 - [ ] S3 bucket created
 - [ ] Can access `/.well-known/openid-configuration`
 - [ ] Can access `/jwks` endpoint
@@ -229,8 +229,6 @@ terraform destroy
 
 Type `yes` when prompted.
 
-**Note**: Secrets Manager secrets have a 7-day recovery window by default.
-
 ## Cost Estimate
 
 For testing/development with low traffic (< 1000 requests/day):
@@ -240,9 +238,9 @@ For testing/development with low traffic (< 1000 requests/day):
 | API Gateway | $0.05 |
 | Lambda | $0.10 |
 | DynamoDB | $0.50 |
-| Secrets Manager | $0.40 |
+| SSM Parameter Store | $0.00 (free tier) |
 | S3 | $0.01 |
-| **Total** | **~$1-2/month** |
+| **Total** | **~$0.66/month** |
 
 For production, costs scale with usage. All services use pay-per-use pricing.
 

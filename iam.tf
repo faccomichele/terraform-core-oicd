@@ -85,19 +85,14 @@ resource "aws_iam_role_policy" "lambda_oidc" {
       {
         Effect = "Allow"
         Action = [
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:PutSecretValue",
-          "secretsmanager:UpdateSecret"
-        ]
-        Resource = aws_secretsmanager_secret.jwt_keys.arn
-      },
-      {
-        Effect = "Allow"
-        Action = [
           "ssm:GetParameter",
-          "ssm:GetParameters"
+          "ssm:GetParameters",
+          "ssm:PutParameter"
         ]
-        Resource = aws_ssm_parameter.issuer_url.arn
+        Resource = [
+          aws_ssm_parameter.issuer_url.arn,
+          aws_ssm_parameter.jwt_keys.arn
+        ]
       }
     ]
   })

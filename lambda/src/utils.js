@@ -1,7 +1,6 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand, DeleteCommand } = require('@aws-sdk/lib-dynamodb');
-const { SecretsManagerClient, GetSecretValueCommand, PutSecretValueCommand } = require('@aws-sdk/client-secrets-manager');
-const { SSMClient, GetParameterCommand } = require('@aws-sdk/client-ssm');
+const { SSMClient, GetParameterCommand, PutParameterCommand } = require('@aws-sdk/client-ssm');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
@@ -9,7 +8,6 @@ const bcrypt = require('bcrypt');
 
 const dynamoClient = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(dynamoClient);
-const secretsClient = new SecretsManagerClient({});
 const ssmClient = new SSMClient({});
 
 const TABLES = {
@@ -80,11 +78,12 @@ async function generateKeyPair() {
 // Get or generate JWT signing keys
 async function getSigningKeys() {
   try {
-    const response = await secretsClient.send(new GetSecretValueCommand({
-      SecretId: process.env.JWT_SECRET_ARN
+    const response = await ssmClient.send(new GetParameterCommand({
+      Name: process.env.JWT_KEYS_PARAM_NAME,
+      WithDecryption: true
     }));
     
-    const keys = JSON.parse(response.SecretString);
+    const keys = JSON.parse(response.Parameter.Value);
     
     // If keys are empty, generate new ones
     if (!keys.private_key || !keys.public_key) {
@@ -99,9 +98,18 @@ async function getSigningKeys() {
         alg: 'RS256'
       };
       
-      await secretsClient.send(new PutSecretValueCommand({
-        SecretId: process.env.JWT_SECRET_ARN,
-        SecretString: JSON.stringify(newKeys)
+      const keysJson = JSON.stringify(newKeys);
+      
+      // Verify size is within SSM parameter limits (4KB for standard parameters)
+      if (keysJson.length > 4096) {
+        throw new Error(`JWT keys too large for SSM parameter: ${keysJson.length} bytes (max 4096)`);
+      }
+      
+      await ssmClient.send(new PutParameterCommand({
+        Name: process.env.JWT_KEYS_PARAM_NAME,
+        Value: keysJson,
+        Type: 'SecureString',
+        Overwrite: true
       }));
       
       return newKeys;

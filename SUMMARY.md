@@ -12,7 +12,7 @@ Successfully implemented a fully serverless OpenID Connect (OIDC) provider using
 - **5 Lambda functions** (Node.js 18.x) for OIDC logic
 - **4 DynamoDB tables** with TTL for data storage
 - **1 S3 bucket** for static assets
-- **1 Secrets Manager secret** for JWT signing keys
+- **2 SSM parameters** for JWT signing keys (encrypted) and issuer URL
 - **IAM roles and policies** with least privilege
 
 ### OIDC Endpoints
@@ -118,7 +118,7 @@ Total: 33 files created
 ### Implemented Security Features
 - ✅ Encryption at rest for DynamoDB tables
 - ✅ Server-side encryption for S3 bucket
-- ✅ Secure key storage in AWS Secrets Manager
+- ✅ Secure key storage in AWS SSM Parameter Store (encrypted)
 - ✅ PKCE support for public clients
 - ✅ Token expiration policies
 - ✅ JWT signature verification
@@ -158,7 +158,7 @@ All security limitations are **clearly documented** with warnings.
 - Lambda (Node.js 18.x)
 - DynamoDB (On-demand billing)
 - S3 (Standard storage)
-- Secrets Manager
+- SSM Parameter Store (encrypted)
 - CloudWatch Logs
 - IAM
 
@@ -228,7 +228,7 @@ Each major aspect has comprehensive documentation:
 - ✅ Infrastructure as Code
 - ✅ Least privilege IAM
 - ✅ Encryption at rest
-- ✅ Secrets management
+- ✅ Encrypted parameter storage
 - ✅ Monitoring and logging
 - ✅ Resource tagging
 

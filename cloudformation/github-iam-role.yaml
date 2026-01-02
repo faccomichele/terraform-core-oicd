@@ -201,28 +201,12 @@ Resources:
                   - ssm:DeleteParameter
                   - ssm:GetParameter
                   - ssm:GetParameters
+                  - ssm:DescribeParameters
                   - ssm:AddTagsToResource
                   - ssm:RemoveTagsFromResource
                   - ssm:ListTagsForResource
                 Resource:
-                  - !Sub 'arn:aws:ssm:*:${AWS::AccountId}:parameter/oidc-provider/${Environment}/issuer-url'
-              
-              # Secrets Manager permissions
-              - Sid: SecretsManagerManagement
-                Effect: Allow
-                Action:
-                  - secretsmanager:CreateSecret
-                  - secretsmanager:DeleteSecret
-                  - secretsmanager:DescribeSecret
-                  - secretsmanager:GetSecretValue
-                  - secretsmanager:PutSecretValue
-                  - secretsmanager:UpdateSecret
-                  - secretsmanager:TagResource
-                  - secretsmanager:UntagResource
-                  - secretsmanager:ListSecretVersionIds
-                  - secretsmanager:GetResourcePolicy
-                Resource:
-                  - !Sub 'arn:aws:secretsmanager:*:${AWS::AccountId}:secret:oidc-provider-${Environment}-jwt-keys-*'
+                  - !Sub 'arn:aws:ssm:*:${AWS::AccountId}:parameter/oidc-provider/${Environment}/*'
               
               # IAM permissions for Lambda execution role and API Gateway CloudWatch role
               - Sid: IAMRoleManagement
@@ -297,7 +281,6 @@ Resources:
                   - lambda:ListFunctions
                   - lambda:GetFunctionCodeSigningConfig
                   - dynamodb:ListTables
-                  - secretsmanager:ListSecrets
                   - ssm:DescribeParameters
                   - iam:ListRoles
                 Resource: '*'

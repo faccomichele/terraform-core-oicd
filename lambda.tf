@@ -15,7 +15,7 @@ resource "aws_lambda_function" "wellknown" {
       CLIENTS_TABLE         = aws_dynamodb_table.clients.name
       AUTH_CODES_TABLE      = aws_dynamodb_table.auth_codes.name
       REFRESH_TOKENS_TABLE  = aws_dynamodb_table.refresh_tokens.name
-      JWT_SECRET_ARN        = aws_secretsmanager_secret.jwt_keys.arn
+      JWT_KEYS_PARAM_NAME   = aws_ssm_parameter.jwt_keys.name
     }
   }
 
@@ -42,7 +42,7 @@ resource "aws_lambda_function" "jwks" {
       CLIENTS_TABLE         = aws_dynamodb_table.clients.name
       AUTH_CODES_TABLE      = aws_dynamodb_table.auth_codes.name
       REFRESH_TOKENS_TABLE  = aws_dynamodb_table.refresh_tokens.name
-      JWT_SECRET_ARN        = aws_secretsmanager_secret.jwt_keys.arn
+      JWT_KEYS_PARAM_NAME   = aws_ssm_parameter.jwt_keys.name
     }
   }
 
@@ -69,7 +69,7 @@ resource "aws_lambda_function" "auth" {
       CLIENTS_TABLE         = aws_dynamodb_table.clients.name
       AUTH_CODES_TABLE      = aws_dynamodb_table.auth_codes.name
       REFRESH_TOKENS_TABLE  = aws_dynamodb_table.refresh_tokens.name
-      JWT_SECRET_ARN        = aws_secretsmanager_secret.jwt_keys.arn
+      JWT_KEYS_PARAM_NAME   = aws_ssm_parameter.jwt_keys.name
     }
   }
 
@@ -96,7 +96,7 @@ resource "aws_lambda_function" "token" {
       CLIENTS_TABLE         = aws_dynamodb_table.clients.name
       AUTH_CODES_TABLE      = aws_dynamodb_table.auth_codes.name
       REFRESH_TOKENS_TABLE  = aws_dynamodb_table.refresh_tokens.name
-      JWT_SECRET_ARN        = aws_secretsmanager_secret.jwt_keys.arn
+      JWT_KEYS_PARAM_NAME   = aws_ssm_parameter.jwt_keys.name
     }
   }
 
@@ -123,7 +123,7 @@ resource "aws_lambda_function" "userinfo" {
       CLIENTS_TABLE         = aws_dynamodb_table.clients.name
       AUTH_CODES_TABLE      = aws_dynamodb_table.auth_codes.name
       REFRESH_TOKENS_TABLE  = aws_dynamodb_table.refresh_tokens.name
-      JWT_SECRET_ARN        = aws_secretsmanager_secret.jwt_keys.arn
+      JWT_KEYS_PARAM_NAME   = aws_ssm_parameter.jwt_keys.name
     }
   }
 
@@ -191,7 +191,7 @@ resource "aws_lambda_function" "user_management" {
       CLIENTS_TABLE         = aws_dynamodb_table.clients.name
       AUTH_CODES_TABLE      = aws_dynamodb_table.auth_codes.name
       REFRESH_TOKENS_TABLE  = aws_dynamodb_table.refresh_tokens.name
-      JWT_SECRET_ARN        = aws_secretsmanager_secret.jwt_keys.arn
+      JWT_KEYS_PARAM_NAME   = aws_ssm_parameter.jwt_keys.name
     }
   }
 

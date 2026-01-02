@@ -141,27 +141,26 @@ The inline policy `TerraformDeploymentPolicy` has been added to the GitHub Actio
 
 ---
 
-### 5. Secrets Manager Management (`SecretsManagerManagement`)
+### 5. SSM Parameter Store Management (`SSMParameterManagement`)
 
-**Purpose**: Create and manage Secrets Manager secret for JWT signing keys.
+**Purpose**: Create and manage SSM Parameter Store parameters for JWT signing keys and issuer URL.
 
 **Actions**:
-- `secretsmanager:CreateSecret` - Create new secret
-- `secretsmanager:DeleteSecret` - Delete secret during cleanup
-- `secretsmanager:DescribeSecret` - Read secret metadata
-- `secretsmanager:GetSecretValue` - Read secret value (for Terraform state)
-- `secretsmanager:PutSecretValue` - Update secret value
-- `secretsmanager:UpdateSecret` - Update secret configuration
-- `secretsmanager:TagResource` - Add tags to secret
-- `secretsmanager:UntagResource` - Remove tags from secret
-- `secretsmanager:ListSecretVersionIds` - List secret versions
+- `ssm:PutParameter` - Create or update parameter
+- `ssm:GetParameter` - Read parameter value
+- `ssm:GetParameters` - Read multiple parameters
+- `ssm:DeleteParameter` - Delete parameter during cleanup
+- `ssm:DescribeParameters` - Read parameter metadata
+- `ssm:AddTagsToResource` - Add tags to parameter
+- `ssm:RemoveTagsFromResource` - Remove tags from parameter
+- `ssm:ListTagsForResource` - List parameter tags
 
 **Resources**:
-- `arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:oidc-provider-${Environment}-jwt-keys-*`
+- `arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/oidc-provider-${Environment}-*`
 
 **Terraform Resources**:
-- `aws_secretsmanager_secret.jwt_keys`
-- `aws_secretsmanager_secret_version.jwt_keys`
+- `aws_ssm_parameter.jwt_keys` (SecureString for encrypted JWT keys)
+- `aws_ssm_parameter.issuer_url` (String for OIDC issuer URL)
 
 ---
 
@@ -260,7 +259,7 @@ The inline policy `TerraformDeploymentPolicy` has been added to the GitHub Actio
 - `lambda:ListFunctions` - List Lambda functions
 - `dynamodb:ListTables` - List DynamoDB tables
 - `s3:ListAllMyBuckets` - List S3 buckets
-- `secretsmanager:ListSecrets` - List Secrets Manager secrets
+- `ssm:DescribeParameters` - List SSM parameters
 - `iam:ListRoles` - List IAM roles
 
 **Resources**: `*` (required for list operations)
@@ -341,5 +340,5 @@ If you add:
 - [AWS IAM Actions for API Gateway](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-control-access-using-iam-policies-to-invoke-api.html)
 - [AWS IAM Actions for DynamoDB](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/api-permissions-reference.html)
 - [AWS IAM Actions for S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/list_amazons3.html)
-- [AWS IAM Actions for Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/auth-and-access_identity-based-policies.html)
+- [AWS IAM Actions for SSM Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/auth-and-access-control-iam-identity-based-access-control.html)
 - [Terraform AWS Provider Documentation](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)

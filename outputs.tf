@@ -29,9 +29,9 @@ output "dynamodb_auth_codes_table" {
 }
 
 
-output "jwt_signing_key_secret_arn" {
-  description = "ARN of the Secrets Manager secret containing JWT signing keys"
-  value       = aws_secretsmanager_secret.jwt_keys.arn
+output "jwt_signing_key_parameter_name" {
+  description = "SSM Parameter name containing JWT signing keys (encrypted)"
+  value       = aws_ssm_parameter.jwt_keys.name
 }
 
 output "issuer_url_ssm_parameter" {

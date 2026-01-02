@@ -32,14 +32,14 @@
          ┌────────┴────────────────────┴─────────────────────┴─────────┐
          │                                                             │
          ▼                           ▼                          ▼      │
-┌──────────────────┐      ┌──────────────────┐      ┌──────────────────┤
-│   DynamoDB       │      │   DynamoDB       │      │   Secrets        │
-│   Users Table    │      │   Clients Table  │      │   Manager        │
+┌──────────────────┐      ┌──────────────────┐      ┌──────────────────┐
+│   DynamoDB       │      │   DynamoDB       │      │   SSM Parameter  │
+│   Users Table    │      │   Clients Table  │      │   Store          │
 │                  │      │                  │      │                  │
 │ - user_id        │      │ - client_id      │      │ - RSA Keys       │
 │ - username       │      │ - client_secret  │      │ - kid            │
 │ - password_hash  │      │ - redirect_uris  │      │ - alg (RS256)    │
-│ - email          │      │ - grant_types    │      │                  │
+│ - email          │      │ - grant_types    │      │ - (Encrypted)    │
 │ - profile        │      │                  │      │                  │
 └──────────────────┘      └──────────────────┘      └──────────────────┘
          │
@@ -112,7 +112,7 @@
      │                        (DynamoDB Users)                │
      │                                                        │
      │                    11. Sign tokens                     │
-     │                        (Secrets Manager - RSA Keys)    │
+     │                        (SSM Parameter Store - RSA Keys)│
      │                                                        │
      │                    12. Create refresh token            │
      │                        (DynamoDB Refresh Tokens)       │
@@ -164,7 +164,7 @@
 2. Lambda validates code from DynamoDB Auth Codes table
 3. Lambda validates client from DynamoDB Clients table
 4. Lambda retrieves user from DynamoDB Users table
-5. Lambda gets RSA keys from Secrets Manager
+5. Lambda gets RSA keys from SSM Parameter Store (encrypted)
 6. Lambda signs JWT tokens (access token + ID token)
 7. Lambda creates refresh token in DynamoDB Refresh Tokens table
 8. Lambda returns tokens to client
@@ -180,7 +180,7 @@
 ### JWT Signing
 - **Algorithm**: RS256 (RSA Signature with SHA-256)
 - **Key Size**: 2048 bits
-- **Storage**: AWS Secrets Manager with encryption
+- **Storage**: AWS Systems Manager Parameter Store (SecureString) with encryption
 - **Rotation**: Keys stored but not automatically rotated (enhancement needed)
 
 ### Password Storage
@@ -191,7 +191,7 @@
 ### Data Encryption
 - **DynamoDB**: Encryption at rest enabled
 - **S3**: Server-side encryption (AES-256)
-- **Secrets Manager**: Encrypted by default with AWS KMS
+- **SSM Parameter Store**: Encrypted with AWS KMS (SecureString type)
 
 ### Token Expiration
 - **Access Token**: 1 hour
@@ -212,7 +212,8 @@ All resources are defined in Terraform:
 - **lambda.tf**: Lambda functions, permissions
 - **dynamodb.tf**: DynamoDB tables with TTL
 - **s3.tf**: S3 bucket with encryption
-- **secrets.tf**: Secrets Manager for JWT keys
+- **secrets.tf**: SSM Parameter Store (SecureString) for JWT keys
+- **ssm.tf**: SSM Parameter Store for issuer URL
 - **iam.tf**: IAM roles and policies
 - **variables.tf**: Input variables
 - **outputs.tf**: Output values
@@ -222,7 +223,7 @@ All resources are defined in Terraform:
 - **API Gateway**: Scales automatically, 10,000 requests/second default
 - **Lambda**: Scales automatically, 1,000 concurrent executions default
 - **DynamoDB**: On-demand billing, auto-scaling
-- **Secrets Manager**: No scaling concerns
+- **SSM Parameter Store**: No scaling concerns
 - **S3**: Unlimited scalability
 
 ## Cost Optimization
@@ -231,6 +232,6 @@ All resources are defined in Terraform:
 - **DynamoDB**: On-demand billing (pay for what you use)
 - **API Gateway**: Pay per request
 - **S3**: Pay for storage and requests (minimal)
-- **Secrets Manager**: $0.40/secret/month + $0.05 per 10,000 API calls
+- **SSM Parameter Store**: Free for standard parameters (up to 10,000), encrypted with KMS
 
-Estimated cost for low traffic (1,000 requests/day): **$1-5/month**
+Estimated cost for low traffic (1,000 requests/day): **$1-2/month**

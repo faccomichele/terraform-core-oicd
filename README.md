@@ -9,7 +9,7 @@ This project implements a complete OIDC provider using:
 - **API Gateway**: REST API endpoints for OIDC protocol
 - **Lambda**: Serverless compute for authentication and token logic
 - **DynamoDB**: Storage for users, OAuth clients, authorization codes, and refresh tokens
-- **Secrets Manager**: Secure storage for JWT signing keys (RSA)
+- **SSM Parameter Store**: Secure encrypted storage for JWT signing keys (RSA)
 - **S3**: Storage for static assets
 
 ### OIDC Endpoints
@@ -234,7 +234,7 @@ All Lambda functions are Node.js 18.x with shared utilities:
 
 ### Security
 
-- RSA 2048-bit keys for JWT signing (stored in Secrets Manager)
+- RSA 2048-bit keys for JWT signing (stored in SSM Parameter Store with encryption)
 - PKCE support for public clients
 - Secure password hashing using bcrypt with salt rounds of 10
 - DynamoDB encryption at rest
@@ -252,7 +252,7 @@ All Lambda functions are Node.js 18.x with shared utilities:
 | `dynamodb_clients_table` | Clients table name |
 | `dynamodb_auth_codes_table` | Auth codes table name |
 | `s3_bucket_name` | Assets bucket name |
-| `jwt_signing_key_secret_arn` | Secrets Manager ARN for JWT keys |
+| `jwt_signing_key_parameter_name` | SSM Parameter name for JWT keys (encrypted) |
 
 ## Development
 
@@ -267,7 +267,7 @@ All Lambda functions are Node.js 18.x with shared utilities:
 ├── lambda.tf               # Lambda functions
 ├── dynamodb.tf             # DynamoDB tables
 ├── s3.tf                   # S3 bucket
-├── secrets.tf              # Secrets Manager
+├── secrets.tf              # SSM Parameter Store (encrypted)
 ├── iam.tf                  # IAM roles and policies
 ├── lambda/
 │   └── src/
@@ -310,8 +310,6 @@ To destroy all resources:
 ```bash
 terraform destroy
 ```
-
-**Note**: Secrets Manager secrets have a 7-day recovery window by default.
 
 ## Limitations & Security Considerations
 
