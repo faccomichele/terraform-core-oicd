@@ -19,6 +19,8 @@ const TABLES = {
 };
 
 // Cache for issuer URL to avoid repeated SSM calls
+// Note: Lambda containers in Node.js handle one request at a time,
+// so module-level caching is safe for concurrent invocations
 let cachedIssuerUrl = null;
 let cacheTimestamp = null;
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
@@ -41,8 +43,16 @@ async function getIssuerUrl() {
     cacheTimestamp = now;
     return cachedIssuerUrl;
   } catch (error) {
-    console.error('Error getting issuer URL from SSM:', error);
-    throw error;
+    if (error.name === 'ParameterNotFound') {
+      console.error('SSM Parameter not found:', process.env.ISSUER_URL_PARAM_NAME);
+      throw new Error('OIDC issuer URL parameter not found in SSM');
+    } else if (error.name === 'AccessDeniedException') {
+      console.error('Access denied to SSM parameter:', process.env.ISSUER_URL_PARAM_NAME);
+      throw new Error('Access denied to OIDC issuer URL parameter');
+    } else {
+      console.error('Error getting issuer URL from SSM:', error.name, error.message);
+      throw new Error(`Failed to retrieve OIDC issuer URL: ${error.message}`);
+    }
   }
 }
 

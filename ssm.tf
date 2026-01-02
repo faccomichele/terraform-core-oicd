@@ -6,7 +6,7 @@ resource "aws_ssm_parameter" "issuer_url" {
   name        = "/${local.project_name}/${local.environment}/issuer-url"
   description = "OIDC Issuer URL for the provider"
   type        = "String"
-  value       = var.issuer_url != "" ? var.issuer_url : "https://placeholder.example.com"
+  value       = var.issuer_url != "" ? var.issuer_url : local.placeholder_issuer_url
 
   tags = {
     Name = "${local.project_name}-${local.environment}-issuer-url"
@@ -29,12 +29,14 @@ resource "null_resource" "update_issuer_url" {
 
   provisioner "local-exec" {
     command = <<-EOT
+      set -e
       aws ssm put-parameter \
         --name "${aws_ssm_parameter.issuer_url.name}" \
         --value "${aws_api_gateway_deployment.oidc.invoke_url}/${local.environment}" \
         --type String \
         --overwrite \
-        --region ${local.aws_region}
+        --region ${local.aws_region} || exit 1
+      echo "Successfully updated SSM parameter with issuer URL"
     EOT
   }
 

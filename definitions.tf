@@ -3,6 +3,7 @@ locals {
   aws_region        = split("_", terraform.workspace)[1]
   project_name      = "oidc-provider"
   lambda_source_dir = "${path.module}/lambda/src"
+  placeholder_issuer_url = "https://placeholder.example.com"
 }
 
 locals {
