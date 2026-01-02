@@ -7,6 +7,32 @@ const {
 } = require('./utils');
 
 /**
+ * Validate password strength
+ * @param {string} password - Password to validate
+ * @returns {object|null} - Error response object if invalid, null if valid
+ */
+function validatePassword(password) {
+  // Validate password strength
+  // Minimum 8 characters, at least one uppercase, one lowercase, one number, and one special character
+  if (password.length < 8) {
+    return createErrorResponse('invalid_request', 'Password must be at least 8 characters long');
+  }
+  if (!/[A-Z]/.test(password)) {
+    return createErrorResponse('invalid_request', 'Password must contain at least one uppercase letter');
+  }
+  if (!/[a-z]/.test(password)) {
+    return createErrorResponse('invalid_request', 'Password must contain at least one lowercase letter');
+  }
+  if (!/[0-9]/.test(password)) {
+    return createErrorResponse('invalid_request', 'Password must contain at least one number');
+  }
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    return createErrorResponse('invalid_request', 'Password must contain at least one special character');
+  }
+  return null;
+}
+
+/**
  * Lambda function for user management operations
  * Can be invoked from AWS Console with test payloads
  * 
@@ -40,9 +66,6 @@ const {
  * {
  *   "operation": "resetPassword",
  *   "username": "existinguser",
- *   "newPassword": "NewSecurePassword123!"
- * }
- */
  *   "newPassword": "NewSecurePassword123!"
  * }
  */
@@ -97,21 +120,9 @@ async function handleCreateUser(event) {
   }
   
   // Validate password strength
-  // Minimum 8 characters, at least one uppercase, one lowercase, one number, and one special character
-  if (password.length < 8) {
-    return createErrorResponse('invalid_request', 'Password must be at least 8 characters long');
-  }
-  if (!/[A-Z]/.test(password)) {
-    return createErrorResponse('invalid_request', 'Password must contain at least one uppercase letter');
-  }
-  if (!/[a-z]/.test(password)) {
-    return createErrorResponse('invalid_request', 'Password must contain at least one lowercase letter');
-  }
-  if (!/[0-9]/.test(password)) {
-    return createErrorResponse('invalid_request', 'Password must contain at least one number');
-  }
-  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-    return createErrorResponse('invalid_request', 'Password must contain at least one special character');
+  const passwordError = validatePassword(password);
+  if (passwordError) {
+    return passwordError;
   }
   
   // Check if username already exists
@@ -144,21 +155,9 @@ async function handleResetPassword(event) {
   }
   
   // Validate password strength
-  // Minimum 8 characters, at least one uppercase, one lowercase, one number, and one special character
-  if (newPassword.length < 8) {
-    return createErrorResponse('invalid_request', 'Password must be at least 8 characters long');
-  }
-  if (!/[A-Z]/.test(newPassword)) {
-    return createErrorResponse('invalid_request', 'Password must contain at least one uppercase letter');
-  }
-  if (!/[a-z]/.test(newPassword)) {
-    return createErrorResponse('invalid_request', 'Password must contain at least one lowercase letter');
-  }
-  if (!/[0-9]/.test(newPassword)) {
-    return createErrorResponse('invalid_request', 'Password must contain at least one number');
-  }
-  if (!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
-    return createErrorResponse('invalid_request', 'Password must contain at least one special character');
+  const passwordError = validatePassword(newPassword);
+  if (passwordError) {
+    return passwordError;
   }
   
   // Get user by username
