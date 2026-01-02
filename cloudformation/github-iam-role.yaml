@@ -201,6 +201,9 @@ Resources:
                   - ssm:DeleteParameter
                   - ssm:GetParameter
                   - ssm:GetParameters
+                  - ssm:AddTagsToResource
+                  - ssm:RemoveTagsFromResource
+                  - ssm:ListTagsForResource
                 Resource:
                   - !Sub 'arn:aws:ssm:*:${AWS::AccountId}:parameter/oidc-provider/${Environment}/issuer-url'
               
@@ -296,6 +299,7 @@ Resources:
                   - dynamodb:ListTables
                   - s3:ListAllMyBuckets
                   - secretsmanager:ListSecrets
+                  - ssm:DescribeParameters
                   - iam:ListRoles
                 Resource: '*'
       Tags:

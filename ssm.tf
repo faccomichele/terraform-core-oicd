@@ -6,6 +6,7 @@ resource "aws_ssm_parameter" "issuer_url" {
   name        = "/${local.project_name}/${local.environment}/issuer-url"
   description = "OIDC Issuer URL for the provider"
   type        = "String"
+  overwrite   = true
   value       = var.issuer_url != "" ? var.issuer_url : local.placeholder_issuer_url
 
   tags = {
