@@ -251,6 +251,17 @@ You can customize the deployment by modifying variables:
 - `project_name`: Prefix for resource names
 - `issuer_url`: Custom issuer URL (optional)
 
+### Issuer URL Configuration
+
+The OIDC issuer URL is stored in AWS Systems Manager Parameter Store to avoid circular dependencies between Lambda functions and API Gateway. 
+
+- If you provide a custom `issuer_url` variable, it will be used directly
+- If no `issuer_url` is provided, the system will:
+  1. Initialize with a placeholder value during initial deployment
+  2. Automatically update to the API Gateway URL after deployment completes
+
+Lambda functions retrieve the issuer URL dynamically from SSM Parameter Store at runtime, which allows for flexible URL configuration without redeploying Lambda functions.
+
 ## Cleanup
 
 To destroy all resources:
