@@ -98,9 +98,16 @@ async function getSigningKeys() {
         alg: 'RS256'
       };
       
+      const keysJson = JSON.stringify(newKeys);
+      
+      // Verify size is within SSM parameter limits (4KB for standard parameters)
+      if (keysJson.length > 4096) {
+        throw new Error(`JWT keys too large for SSM parameter: ${keysJson.length} bytes (max 4096)`);
+      }
+      
       await ssmClient.send(new PutParameterCommand({
         Name: process.env.JWT_KEYS_PARAM_NAME,
-        Value: JSON.stringify(newKeys),
+        Value: keysJson,
         Type: 'SecureString',
         Overwrite: true
       }));

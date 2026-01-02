@@ -1,5 +1,7 @@
 # SSM Parameter (encrypted) for JWT signing keys
-# Using SecureString type for encryption at rest
+# Using SecureString type for encryption at rest with AWS managed KMS key
+# Note: For enhanced security and audit capabilities, consider using a 
+# customer-managed KMS key by adding: key_id = aws_kms_key.example.id
 resource "aws_ssm_parameter" "jwt_keys" {
   name        = "${local.project_name}-${local.environment}-jwt-keys"
   description = "RSA key pair for JWT signing (encrypted)"
