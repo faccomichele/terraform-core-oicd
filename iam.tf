@@ -101,6 +101,14 @@ resource "aws_iam_role_policy" "lambda_oidc" {
           "secretsmanager:UpdateSecret"
         ]
         Resource = aws_secretsmanager_secret.jwt_keys.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:GetParameter",
+          "ssm:GetParameters"
+        ]
+        Resource = aws_ssm_parameter.issuer_url.arn
       }
     ]
   })

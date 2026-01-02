@@ -1,8 +1,8 @@
-const { createResponse } = require('./utils');
+const { createResponse, getIssuerUrl } = require('./utils');
 
 exports.handler = async (event) => {
   try {
-    const issuerUrl = process.env.ISSUER_URL;
+    const issuerUrl = await getIssuerUrl();
     
     const configuration = {
       issuer: issuerUrl,

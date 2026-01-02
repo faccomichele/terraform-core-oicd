@@ -1,6 +1,7 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand, DeleteCommand } = require('@aws-sdk/lib-dynamodb');
 const { SecretsManagerClient, GetSecretValueCommand, PutSecretValueCommand } = require('@aws-sdk/client-secrets-manager');
+const { SSMClient, GetParameterCommand } = require('@aws-sdk/client-ssm');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
@@ -8,6 +9,7 @@ const { v4: uuidv4 } = require('uuid');
 const dynamoClient = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(dynamoClient);
 const secretsClient = new SecretsManagerClient({});
+const ssmClient = new SSMClient({});
 
 const TABLES = {
   users: process.env.USERS_TABLE,
@@ -15,6 +17,28 @@ const TABLES = {
   authCodes: process.env.AUTH_CODES_TABLE,
   refreshTokens: process.env.REFRESH_TOKENS_TABLE
 };
+
+// Cache for issuer URL to avoid repeated SSM calls
+let cachedIssuerUrl = null;
+
+// Get issuer URL from SSM Parameter Store
+async function getIssuerUrl() {
+  if (cachedIssuerUrl) {
+    return cachedIssuerUrl;
+  }
+
+  try {
+    const response = await ssmClient.send(new GetParameterCommand({
+      Name: process.env.ISSUER_URL_PARAM_NAME
+    }));
+    
+    cachedIssuerUrl = response.Parameter.Value;
+    return cachedIssuerUrl;
+  } catch (error) {
+    console.error('Error getting issuer URL from SSM:', error);
+    throw error;
+  }
+}
 
 // Generate RSA key pair for JWT signing
 async function generateKeyPair() {
@@ -76,22 +100,24 @@ async function getSigningKeys() {
 // Create JWT token
 async function createJWT(payload, expiresIn = '1h') {
   const keys = await getSigningKeys();
+  const issuerUrl = await getIssuerUrl();
   
   return jwt.sign(payload, keys.private_key, {
     algorithm: 'RS256',
     expiresIn: expiresIn,
     keyid: keys.kid,
-    issuer: process.env.ISSUER_URL
+    issuer: issuerUrl
   });
 }
 
 // Verify JWT token
 async function verifyJWT(token) {
   const keys = await getSigningKeys();
+  const issuerUrl = await getIssuerUrl();
   
   return jwt.verify(token, keys.public_key, {
     algorithms: ['RS256'],
-    issuer: process.env.ISSUER_URL
+    issuer: issuerUrl
   });
 }
 
@@ -286,6 +312,7 @@ function createHTMLResponse(html, statusCode = 200) {
 }
 
 module.exports = {
+  getIssuerUrl,
   getSigningKeys,
   createJWT,
   verifyJWT,

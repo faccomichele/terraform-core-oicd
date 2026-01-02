@@ -1,4 +1,3 @@
-# Lambda function for wellknown endpoint
 resource "aws_lambda_function" "wellknown" {
   filename         = data.archive_file.lambda_zip.output_path
   function_name    = "${local.project_name}-${local.environment}-wellknown"
@@ -11,7 +10,7 @@ resource "aws_lambda_function" "wellknown" {
 
   environment {
     variables = {
-      ISSUER_URL         = local.issuer_url
+      ISSUER_URL_PARAM_NAME = aws_ssm_parameter.issuer_url.name
       USERS_TABLE        = aws_dynamodb_table.users.name
       CLIENTS_TABLE      = aws_dynamodb_table.clients.name
       AUTH_CODES_TABLE   = aws_dynamodb_table.auth_codes.name
@@ -39,7 +38,7 @@ resource "aws_lambda_function" "jwks" {
 
   environment {
     variables = {
-      ISSUER_URL         = local.issuer_url
+      ISSUER_URL_PARAM_NAME = aws_ssm_parameter.issuer_url.name
       USERS_TABLE        = aws_dynamodb_table.users.name
       CLIENTS_TABLE      = aws_dynamodb_table.clients.name
       AUTH_CODES_TABLE   = aws_dynamodb_table.auth_codes.name
@@ -67,7 +66,7 @@ resource "aws_lambda_function" "auth" {
 
   environment {
     variables = {
-      ISSUER_URL         = local.issuer_url
+      ISSUER_URL_PARAM_NAME = aws_ssm_parameter.issuer_url.name
       USERS_TABLE        = aws_dynamodb_table.users.name
       CLIENTS_TABLE      = aws_dynamodb_table.clients.name
       AUTH_CODES_TABLE   = aws_dynamodb_table.auth_codes.name
@@ -95,7 +94,7 @@ resource "aws_lambda_function" "token" {
 
   environment {
     variables = {
-      ISSUER_URL         = local.issuer_url
+      ISSUER_URL_PARAM_NAME = aws_ssm_parameter.issuer_url.name
       USERS_TABLE        = aws_dynamodb_table.users.name
       CLIENTS_TABLE      = aws_dynamodb_table.clients.name
       AUTH_CODES_TABLE   = aws_dynamodb_table.auth_codes.name
@@ -123,7 +122,7 @@ resource "aws_lambda_function" "userinfo" {
 
   environment {
     variables = {
-      ISSUER_URL         = local.issuer_url
+      ISSUER_URL_PARAM_NAME = aws_ssm_parameter.issuer_url.name
       USERS_TABLE        = aws_dynamodb_table.users.name
       CLIENTS_TABLE      = aws_dynamodb_table.clients.name
       AUTH_CODES_TABLE   = aws_dynamodb_table.auth_codes.name
