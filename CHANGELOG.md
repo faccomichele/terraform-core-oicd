@@ -57,6 +57,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Fixed Lambda "Cannot find module 'jsonwebtoken'" error by including node_modules in deployment package
+  - Removed node_modules from archive_file excludes in lambda.tf
+  - Lambda deployment package now includes all required npm dependencies
+  - Users must run `./scripts/setup.sh` before `terraform apply` to install dependencies
+
 ### Planned Features
 - User registration endpoint
 - Consent screen for authorization
