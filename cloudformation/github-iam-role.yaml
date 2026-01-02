@@ -149,7 +149,7 @@ Resources:
                   - lambda:RemovePermission
                   - lambda:GetPolicy
                 Resource:
-                  - !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:oidc-provider-${Environment}-*'
+                  - !Sub 'arn:aws:lambda:*:${AWS::AccountId}:function:oidc-provider-${Environment}-*'
               
               # API Gateway permissions
               - Sid: APIGatewayManagement
@@ -161,9 +161,9 @@ Resources:
                   - apigateway:PATCH
                   - apigateway:DELETE
                 Resource:
-                  - !Sub 'arn:aws:apigateway:${AWS::Region}::/restapis'
-                  - !Sub 'arn:aws:apigateway:${AWS::Region}::/restapis/*'
-                  - !Sub 'arn:aws:apigateway:${AWS::Region}::/tags/*'
+                  - !Sub 'arn:aws:apigateway:*::/restapis'
+                  - !Sub 'arn:aws:apigateway:*::/restapis/*'
+                  - !Sub 'arn:aws:apigateway:*::/tags/*'
               
               # API Gateway account settings (required for CloudWatch Logs integration)
               - Sid: APIGatewayAccountSettings
@@ -173,7 +173,7 @@ Resources:
                   - apigateway:PATCH
                   - apigateway:GET
                 Resource:
-                  - !Sub 'arn:aws:apigateway:${AWS::Region}::/account'
+                  - !Sub 'arn:aws:apigateway:*::/account'
               
               # DynamoDB permissions
               - Sid: DynamoDBManagement
@@ -191,39 +191,18 @@ Resources:
                   - dynamodb:UpdateContinuousBackups
                   - dynamodb:UpdateTimeToLive
                 Resource:
-                  - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/oidc-provider-${Environment}-*'
+                  - !Sub 'arn:aws:dynamodb:*:${AWS::AccountId}:table/oidc-provider-${Environment}-*'
               
-              # S3 permissions
-              - Sid: S3BucketManagement
+              # SSM Parameter Store permissions
+              - Sid: SSMParameterManagement
                 Effect: Allow
                 Action:
-                  - s3:CreateBucket
-                  - s3:DeleteBucket
-                  - s3:GetBucketLocation
-                  - s3:GetBucketPolicy
-                  - s3:GetBucketVersioning
-                  - s3:GetBucketPublicAccessBlock
-                  - s3:GetEncryptionConfiguration
-                  - s3:GetBucketAcl
-                  - s3:GetBucketCORS
-                  - s3:GetBucketLogging
-                  - s3:GetBucketRequestPayment
-                  - s3:GetBucketTagging
-                  - s3:GetBucketWebsite
-                  - s3:GetLifecycleConfiguration
-                  - s3:GetReplicationConfiguration
-                  - s3:GetAccelerateConfiguration
-                  - s3:GetBucketObjectLockConfiguration
-                  - s3:PutBucketPolicy
-                  - s3:PutBucketVersioning
-                  - s3:PutBucketPublicAccessBlock
-                  - s3:PutEncryptionConfiguration
-                  - s3:PutBucketAcl
-                  - s3:PutBucketTagging
-                  - s3:DeleteBucketPolicy
-                  - s3:ListBucket
+                  - ssm:PutParameter
+                  - ssm:DeleteParameter
+                  - ssm:GetParameter
+                  - ssm:GetParameters
                 Resource:
-                  - !Sub 'arn:aws:s3:::oidc-provider-${Environment}-assets-*'
+                  - !Sub 'arn:aws:ssm:*:${AWS::AccountId}:parameter/oidc-provider/${Environment}/issuer-url'
               
               # Secrets Manager permissions
               - Sid: SecretsManagerManagement
@@ -240,7 +219,7 @@ Resources:
                   - secretsmanager:ListSecretVersionIds
                   - secretsmanager:GetResourcePolicy
                 Resource:
-                  - !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:oidc-provider-${Environment}-jwt-keys-*'
+                  - !Sub 'arn:aws:secretsmanager:*:${AWS::AccountId}:secret:oidc-provider-${Environment}-jwt-keys-*'
               
               # IAM permissions for Lambda execution role and API Gateway CloudWatch role
               - Sid: IAMRoleManagement
@@ -289,8 +268,8 @@ Resources:
                   - logs:PutRetentionPolicy
                   - logs:DeleteRetentionPolicy
                 Resource:
-                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/oidc-provider-${Environment}-*'
-                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/oidc-provider-${Environment}-*:*'
+                  - !Sub 'arn:aws:logs:*:${AWS::AccountId}:log-group:/aws/lambda/oidc-provider-${Environment}-*'
+                  - !Sub 'arn:aws:logs:*:${AWS::AccountId}:log-group:/aws/lambda/oidc-provider-${Environment}-*:*'
               
               # Additional CloudWatch Logs permissions for API Gateway
               # Separate statement with wildcard resource because API Gateway may create log groups
@@ -302,7 +281,7 @@ Resources:
                   - logs:CreateLogGroup
                   - logs:DescribeLogGroups
                 Resource:
-                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*'
+                  - !Sub 'arn:aws:logs:*:${AWS::AccountId}:log-group:*'
               
               # Terraform state and resource discovery
               # Wildcard resource access is required for list/discovery operations that Terraform

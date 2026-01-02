@@ -16,7 +16,6 @@ resource "aws_lambda_function" "wellknown" {
       AUTH_CODES_TABLE      = aws_dynamodb_table.auth_codes.name
       REFRESH_TOKENS_TABLE  = aws_dynamodb_table.refresh_tokens.name
       JWT_SECRET_ARN        = aws_secretsmanager_secret.jwt_keys.arn
-      S3_BUCKET             = aws_s3_bucket.oidc_assets.id
     }
   }
 
@@ -44,7 +43,6 @@ resource "aws_lambda_function" "jwks" {
       AUTH_CODES_TABLE      = aws_dynamodb_table.auth_codes.name
       REFRESH_TOKENS_TABLE  = aws_dynamodb_table.refresh_tokens.name
       JWT_SECRET_ARN        = aws_secretsmanager_secret.jwt_keys.arn
-      S3_BUCKET             = aws_s3_bucket.oidc_assets.id
     }
   }
 
@@ -72,7 +70,6 @@ resource "aws_lambda_function" "auth" {
       AUTH_CODES_TABLE      = aws_dynamodb_table.auth_codes.name
       REFRESH_TOKENS_TABLE  = aws_dynamodb_table.refresh_tokens.name
       JWT_SECRET_ARN        = aws_secretsmanager_secret.jwt_keys.arn
-      S3_BUCKET             = aws_s3_bucket.oidc_assets.id
     }
   }
 
@@ -100,7 +97,6 @@ resource "aws_lambda_function" "token" {
       AUTH_CODES_TABLE      = aws_dynamodb_table.auth_codes.name
       REFRESH_TOKENS_TABLE  = aws_dynamodb_table.refresh_tokens.name
       JWT_SECRET_ARN        = aws_secretsmanager_secret.jwt_keys.arn
-      S3_BUCKET             = aws_s3_bucket.oidc_assets.id
     }
   }
 
@@ -128,7 +124,6 @@ resource "aws_lambda_function" "userinfo" {
       AUTH_CODES_TABLE      = aws_dynamodb_table.auth_codes.name
       REFRESH_TOKENS_TABLE  = aws_dynamodb_table.refresh_tokens.name
       JWT_SECRET_ARN        = aws_secretsmanager_secret.jwt_keys.arn
-      S3_BUCKET             = aws_s3_bucket.oidc_assets.id
     }
   }
 

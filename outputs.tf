@@ -28,10 +28,6 @@ output "dynamodb_auth_codes_table" {
   value       = aws_dynamodb_table.auth_codes.name
 }
 
-output "s3_bucket_name" {
-  description = "S3 bucket name for static assets"
-  value       = aws_s3_bucket.oidc_assets.id
-}
 
 output "jwt_signing_key_secret_arn" {
   description = "ARN of the Secrets Manager secret containing JWT signing keys"

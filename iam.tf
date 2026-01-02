@@ -81,18 +81,7 @@ resource "aws_iam_role_policy" "lambda_oidc" {
           "${aws_dynamodb_table.refresh_tokens.arn}/index/*"
         ]
       },
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket"
-        ]
-        Resource = [
-          aws_s3_bucket.oidc_assets.arn,
-          "${aws_s3_bucket.oidc_assets.arn}/*"
-        ]
-      },
+      
       {
         Effect = "Allow"
         Action = [
