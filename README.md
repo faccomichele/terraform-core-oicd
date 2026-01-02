@@ -145,6 +145,13 @@ The easiest way to create users or reset passwords is to use the dedicated `user
 2. Find the function named `oidc-provider-<environment>-user-management`
 3. Use the "Test" tab with one of the following payloads:
 
+**Password Requirements:**
+- Minimum 8 characters
+- At least one uppercase letter
+- At least one lowercase letter
+- At least one number
+- At least one special character
+
 **Create a new user:**
 ```json
 {

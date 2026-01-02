@@ -246,6 +246,13 @@ The `user-management` Lambda function can be tested from the AWS Console or AWS 
 3. Go to "Test" tab
 4. Create a test event with one of the payloads below
 
+**Password Requirements:**
+- Minimum 8 characters
+- At least one uppercase letter
+- At least one lowercase letter
+- At least one number
+- At least one special character
+
 **Create a new user:**
 ```json
 {

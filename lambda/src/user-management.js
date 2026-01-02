@@ -14,6 +14,13 @@ const {
  * 1. createUser - Create a new user
  * 2. resetPassword - Reset a user's password
  * 
+ * Password Requirements:
+ * - Minimum 8 characters
+ * - At least one uppercase letter
+ * - At least one lowercase letter
+ * - At least one number
+ * - At least one special character (!@#$%^&*(),.?":{}|<>)
+ * 
  * Example test payloads:
  * 
  * Create User:
@@ -33,6 +40,9 @@ const {
  * {
  *   "operation": "resetPassword",
  *   "username": "existinguser",
+ *   "newPassword": "NewSecurePassword123!"
+ * }
+ */
  *   "newPassword": "NewSecurePassword123!"
  * }
  */
@@ -79,14 +89,29 @@ async function handleCreateUser(event) {
     return createErrorResponse('invalid_request', 'Invalid username format. Username must be 3-50 characters and contain only letters, numbers, dashes, and underscores');
   }
   
-  // Validate email format (basic check)
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  // Validate email format with more comprehensive regex
+  // This pattern checks for basic email structure with proper domain validation
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  if (!emailRegex.test(email)) {
     return createErrorResponse('invalid_request', 'Invalid email format');
   }
   
-  // Validate password strength (minimum 8 characters)
+  // Validate password strength
+  // Minimum 8 characters, at least one uppercase, one lowercase, one number, and one special character
   if (password.length < 8) {
     return createErrorResponse('invalid_request', 'Password must be at least 8 characters long');
+  }
+  if (!/[A-Z]/.test(password)) {
+    return createErrorResponse('invalid_request', 'Password must contain at least one uppercase letter');
+  }
+  if (!/[a-z]/.test(password)) {
+    return createErrorResponse('invalid_request', 'Password must contain at least one lowercase letter');
+  }
+  if (!/[0-9]/.test(password)) {
+    return createErrorResponse('invalid_request', 'Password must contain at least one number');
+  }
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    return createErrorResponse('invalid_request', 'Password must contain at least one special character');
   }
   
   // Check if username already exists
@@ -118,9 +143,22 @@ async function handleResetPassword(event) {
     return createErrorResponse('invalid_request', 'Missing required parameters: username and newPassword are required');
   }
   
-  // Validate password strength (minimum 8 characters)
+  // Validate password strength
+  // Minimum 8 characters, at least one uppercase, one lowercase, one number, and one special character
   if (newPassword.length < 8) {
     return createErrorResponse('invalid_request', 'Password must be at least 8 characters long');
+  }
+  if (!/[A-Z]/.test(newPassword)) {
+    return createErrorResponse('invalid_request', 'Password must contain at least one uppercase letter');
+  }
+  if (!/[a-z]/.test(newPassword)) {
+    return createErrorResponse('invalid_request', 'Password must contain at least one lowercase letter');
+  }
+  if (!/[0-9]/.test(newPassword)) {
+    return createErrorResponse('invalid_request', 'Password must contain at least one number');
+  }
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
+    return createErrorResponse('invalid_request', 'Password must contain at least one special character');
   }
   
   // Get user by username
