@@ -1,18 +1,3 @@
-# Local variables
-locals {
-  # issuer_url = var.issuer_url != "" ? var.issuer_url : "${aws_api_gateway_deployment.oidc.invoke_url}${aws_api_gateway_stage.oidc.stage_name}"
-  issuer_url = "CHANGE_ME"
-  lambda_source_dir = "${path.module}/lambda/src"
-}
-
-# Archive Lambda source code
-data "archive_file" "lambda_zip" {
-  type        = "zip"
-  source_dir  = local.lambda_source_dir
-  output_path = "${path.module}/lambda/function.zip"
-  excludes    = ["node_modules", "package-lock.json"]
-}
-
 # Lambda function for wellknown endpoint
 resource "aws_lambda_function" "wellknown" {
   filename         = data.archive_file.lambda_zip.output_path
