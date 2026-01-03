@@ -1,0 +1,6 @@
+{
+  "operation": "createUser",
+  "username": "testuser",
+  "password": "SecurePassword123!",
+  "email": "testuser@example.com"
+}

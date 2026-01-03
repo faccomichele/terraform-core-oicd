@@ -1,0 +1,11 @@
+{
+  "operation": "createClient",
+  "client_id": "my-app-client",
+  "client_secret": "my-secure-secret-123",
+  "redirect_uris": [
+    "https://myapp.example.com/callback",
+    "https://myapp.example.com/auth/callback"
+  ],
+  "name": "My Application",
+  "description": "My awesome application for testing"
+}

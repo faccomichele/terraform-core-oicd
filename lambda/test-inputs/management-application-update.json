@@ -1,0 +1,7 @@
+{
+  "operation": "updateApplication",
+  "application_id": "my-app-staging",
+  "name": "Staging Environment - Updated",
+  "description": "Updated staging application instance",
+  "account": "new-staging-account-789"
+}

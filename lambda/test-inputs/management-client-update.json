@@ -1,0 +1,11 @@
+{
+  "operation": "updateClient",
+  "client_id": "my-app-client",
+  "redirect_uris": [
+    "https://myapp.example.com/callback",
+    "https://myapp.example.com/auth/callback",
+    "https://newapp.example.com/oauth/callback"
+  ],
+  "name": "My Updated Application",
+  "description": "Updated description for my application"
+}

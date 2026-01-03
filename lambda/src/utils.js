@@ -14,7 +14,9 @@ const TABLES = {
   users: process.env.USERS_TABLE,
   clients: process.env.CLIENTS_TABLE,
   authCodes: process.env.AUTH_CODES_TABLE,
-  refreshTokens: process.env.REFRESH_TOKENS_TABLE
+  refreshTokens: process.env.REFRESH_TOKENS_TABLE,
+  applications: process.env.APPLICATIONS_TABLE,
+  userApplications: process.env.USER_APPLICATIONS_TABLE
 };
 
 // Cache for issuer URL to avoid repeated SSM calls
@@ -358,6 +360,172 @@ function createHTMLResponse(html, statusCode = 200) {
   };
 }
 
+// Client operations
+/**
+ * Create a new OAuth client
+ * @param {string} clientId - The client ID
+ * @param {string} clientSecret - The client secret
+ * @param {Array<string>} redirectUris - Array of allowed redirect URIs
+ * @param {string} name - The client name
+ * @param {string} description - The client description (optional)
+ * @returns {Promise<object>} - The created client object
+ */
+async function createClient(clientId, clientSecret, redirectUris, name, description = '') {
+  const client = {
+    client_id: clientId,
+    client_secret: clientSecret,
+    redirect_uris: redirectUris,
+    name: name,
+    description: description,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  
+  await putItem(TABLES.clients, client);
+  return client;
+}
+
+/**
+ * Update an existing OAuth client
+ * @param {string} clientId - The client ID
+ * @param {object} updates - Object containing fields to update
+ * @returns {Promise<object>} - The updated client object
+ */
+async function updateClient(clientId, updates) {
+  const client = await getClientById(clientId);
+  if (!client) {
+    throw new Error('Client not found');
+  }
+  
+  const updatedClient = {
+    ...client,
+    ...updates,
+    client_id: clientId, // Ensure client_id is not changed
+    updated_at: new Date().toISOString()
+  };
+  
+  await putItem(TABLES.clients, updatedClient);
+  return updatedClient;
+}
+
+// Application operations
+/**
+ * Get application by ID
+ * @param {string} applicationId - The application ID
+ * @returns {Promise<object|null>} - The application object or null if not found
+ */
+async function getApplicationById(applicationId) {
+  return await getItem(TABLES.applications, { application_id: applicationId });
+}
+
+/**
+ * Create a new application
+ * @param {string} applicationId - The application ID (or will be generated)
+ * @param {string} clientId - The associated OAuth client ID
+ * @param {string} name - The application name
+ * @param {string} description - The application description (optional)
+ * @param {string} account - The account identifier (optional)
+ * @returns {Promise<object>} - The created application object
+ */
+async function createApplication(applicationId, clientId, name, description = '', account = '') {
+  const appId = applicationId || uuidv4();
+  
+  const application = {
+    application_id: appId,
+    client_id: clientId,
+    name: name,
+    description: description,
+    account: account,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  
+  await putItem(TABLES.applications, application);
+  return application;
+}
+
+/**
+ * Update an existing application
+ * @param {string} applicationId - The application ID
+ * @param {object} updates - Object containing fields to update
+ * @returns {Promise<object>} - The updated application object
+ */
+async function updateApplication(applicationId, updates) {
+  const application = await getApplicationById(applicationId);
+  if (!application) {
+    throw new Error('Application not found');
+  }
+  
+  const updatedApplication = {
+    ...application,
+    ...updates,
+    application_id: applicationId, // Ensure application_id is not changed
+    updated_at: new Date().toISOString()
+  };
+  
+  await putItem(TABLES.applications, updatedApplication);
+  return updatedApplication;
+}
+
+// User-Application operations
+/**
+ * Get user-application mapping
+ * @param {string} userId - The user ID
+ * @param {string} applicationId - The application ID
+ * @returns {Promise<object|null>} - The user-application mapping or null if not found
+ */
+async function getUserApplication(userId, applicationId) {
+  return await getItem(TABLES.userApplications, { 
+    user_id: userId, 
+    application_id: applicationId 
+  });
+}
+
+/**
+ * Create a new user-application mapping
+ * @param {string} userId - The user ID
+ * @param {string} applicationId - The application ID
+ * @param {string} account - The account identifier (optional)
+ * @returns {Promise<object>} - The created user-application mapping object
+ */
+async function createUserApplication(userId, applicationId, account = '') {
+  const userApplication = {
+    user_id: userId,
+    application_id: applicationId,
+    account: account,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  
+  await putItem(TABLES.userApplications, userApplication);
+  return userApplication;
+}
+
+/**
+ * Update an existing user-application mapping
+ * @param {string} userId - The user ID
+ * @param {string} applicationId - The application ID
+ * @param {object} updates - Object containing fields to update
+ * @returns {Promise<object>} - The updated user-application mapping object
+ */
+async function updateUserApplication(userId, applicationId, updates) {
+  const userApplication = await getUserApplication(userId, applicationId);
+  if (!userApplication) {
+    throw new Error('User-application mapping not found');
+  }
+  
+  const updatedUserApplication = {
+    ...userApplication,
+    ...updates,
+    user_id: userId, // Ensure user_id is not changed
+    application_id: applicationId, // Ensure application_id is not changed
+    updated_at: new Date().toISOString()
+  };
+  
+  await putItem(TABLES.userApplications, updatedUserApplication);
+  return updatedUserApplication;
+}
+
 module.exports = {
   getIssuerUrl,
   getSigningKeys,
@@ -379,5 +547,16 @@ module.exports = {
   createResponse,
   createErrorResponse,
   createHTMLResponse,
-  TABLES
+  TABLES,
+  // New exports for management functions
+  createClient,
+  updateClient,
+  getApplicationById,
+  createApplication,
+  updateApplication,
+  getUserApplication,
+  createUserApplication,
+  updateUserApplication,
+  putItem,
+  getItem
 };
