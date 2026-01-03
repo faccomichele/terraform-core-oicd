@@ -47,7 +47,7 @@ function validatePassword(password) {
  * - At least one uppercase letter
  * - At least one lowercase letter
  * - At least one number
- * - At least one special character (!@#$%^&*(),.?":{}|<>)
+ * - At least one special character (!@#$%^&*(),.?":{}|<>-_+=~[]\)
  * 
  * Example test payloads:
  * 

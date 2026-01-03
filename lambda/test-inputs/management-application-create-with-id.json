@@ -1,0 +1,8 @@
+{
+  "operation": "createApplication",
+  "application_id": "my-app-staging",
+  "client_id": "my-app-client",
+  "name": "Staging Environment",
+  "description": "Staging application instance",
+  "account": "staging-account-456"
+}

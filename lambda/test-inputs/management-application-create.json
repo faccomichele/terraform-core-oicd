@@ -1,0 +1,7 @@
+{
+  "operation": "createApplication",
+  "client_id": "my-app-client",
+  "name": "Production Environment",
+  "description": "Production application instance",
+  "account": "prod-account-123"
+}
